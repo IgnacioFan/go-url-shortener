@@ -2,13 +2,15 @@ package delivery
 
 import (
 	"go-url-shortener/internal/delivery/handler"
+	"go-url-shortener/internal/repository/postgres"
 	"go-url-shortener/internal/usecase"
 
 	"github.com/gin-gonic/gin"
 )
 
 var (
-	shortUrlUsecase = usecase.NewShortUrl()
+	urlRepo         = &postgres.Url{DB: postgres.InitConn()}
+	shortUrlUsecase = usecase.NewShortUrl(urlRepo)
 	shortUrlHandler = handler.NewShortUrlHandler(shortUrlUsecase)
 )
 

@@ -39,6 +39,7 @@ func init() {
 	// viper.SetDefault("author", "Weilong Fan <fan01856472@gmail.com>")
 	// viper.SetDefault("license", "apache")
 	rootCmd.AddCommand(ServerCmd)
+	rootCmd.AddCommand(MigrateCmd)
 }
 
 // reads in config file and ENV variables if set.
