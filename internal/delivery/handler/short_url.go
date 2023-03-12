@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"go-url-shortener/internal/usecase"
 	"net/http"
 
@@ -17,8 +16,10 @@ type ShortUrlRequest struct {
 	ExpirationlenInMins int    `json:"expiration_len_in_mins"`
 }
 
-func NewShortUrlHandler() *ShortUrlHandler {
-	return &ShortUrlHandler{}
+func NewShortUrlHandler(usecase *usecase.ShortUrl) *ShortUrlHandler {
+	return &ShortUrlHandler{
+		ShortUrl: usecase,
+	}
 }
 
 func (h *ShortUrlHandler) Create(ctx *gin.Context) {
@@ -47,5 +48,5 @@ func (h *ShortUrlHandler) Redirect(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, nil)
 		return
 	}
-	ctx.JSON(http.StatusOK, fmt.Sprintf("return this %v", originalURL))
+	ctx.Redirect(http.StatusFound, originalURL)
 }

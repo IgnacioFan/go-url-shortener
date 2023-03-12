@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.9.0
+	github.com/go-playground/assert/v2 v2.2.0
 	github.com/spf13/cobra v1.6.1
 )
 

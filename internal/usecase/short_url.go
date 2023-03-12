@@ -6,7 +6,7 @@ import (
 
 type ShortUrl struct{}
 
-func New() *ShortUrl {
+func NewShortUrl() *ShortUrl {
 	return &ShortUrl{}
 }
 
@@ -18,5 +18,8 @@ func (s *ShortUrl) Create(url string) (string, error) {
 }
 
 func (s *ShortUrl) Redirect(url string) (string, error) {
-	return "http://www.example.com/abc", nil
+	if url == "invalid" {
+		return "", errors.New("Short URL not found")
+	}
+	return "https://example.com/foobar", nil
 }

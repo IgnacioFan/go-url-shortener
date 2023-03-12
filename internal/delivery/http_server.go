@@ -2,11 +2,15 @@ package delivery
 
 import (
 	"go-url-shortener/internal/delivery/handler"
+	"go-url-shortener/internal/usecase"
 
 	"github.com/gin-gonic/gin"
 )
 
-var shortUrlHandler = handler.NewShortUrlHandler()
+var (
+	shortUrlUsecase = usecase.NewShortUrl()
+	shortUrlHandler = handler.NewShortUrlHandler(shortUrlUsecase)
+)
 
 type HttpServer struct {
 	*gin.Engine
