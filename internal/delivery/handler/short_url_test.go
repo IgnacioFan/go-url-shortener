@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"go-url-shortener/internal/usecase"
+	"go-url-shortener/internal/mocks"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -15,8 +15,7 @@ import (
 )
 
 var (
-	response     string
-	shortUrlMock = usecase.NewShortUrl()
+	shortUrlMock = new(mocks.ShortUrlUsecase)
 	handler      = NewShortUrlHandler(shortUrlMock)
 )
 
@@ -56,13 +55,14 @@ func TestCreate(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 			c.Request = req
 
+			shortUrlMock.On("Create", test.Input["url"]).Return(test.ExpectedRes, test.ExpectedErr)
 			handler.Create(c)
 
 			if test.ExpectedErr != nil {
 				assert.Equal(t, http.StatusNotFound, w.Code)
 			} else {
 				assert.Equal(t, http.StatusOK, w.Code)
-				response = ""
+				var response string
 				json.Unmarshal(w.Body.Bytes(), &response)
 				assert.Equal(t, test.ExpectedRes, response)
 			}
@@ -103,6 +103,7 @@ func TestRedirect(t *testing.T) {
 
 			c.Params = append(c.Params, gin.Param{Key: "url", Value: test.Input})
 
+			shortUrlMock.On("Redirect", test.Input).Return(test.ExpectedRes, test.ExpectedErr)
 			handler.Redirect(c)
 
 			if test.ExpectedErr != nil {

@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ShortUrlHandler struct {
-	ShortUrl *usecase.ShortUrl
+type ShortUrl struct {
+	ShortUrl usecase.ShortUrlUsecase
 }
 
 type ShortUrlRequest struct {
@@ -16,13 +16,11 @@ type ShortUrlRequest struct {
 	ExpirationlenInMins int    `json:"expiration_len_in_mins"`
 }
 
-func NewShortUrlHandler(usecase *usecase.ShortUrl) *ShortUrlHandler {
-	return &ShortUrlHandler{
-		ShortUrl: usecase,
-	}
+func NewShortUrlHandler(shortUrl usecase.ShortUrlUsecase) *ShortUrl {
+	return &ShortUrl{ShortUrl: shortUrl}
 }
 
-func (h *ShortUrlHandler) Create(ctx *gin.Context) {
+func (h *ShortUrl) Create(ctx *gin.Context) {
 	request := &ShortUrlRequest{}
 	if err := ctx.BindJSON(request); err != nil {
 		ctx.String(http.StatusNotFound, "Invalid params.")
@@ -37,7 +35,7 @@ func (h *ShortUrlHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, url)
 }
 
-func (h *ShortUrlHandler) Redirect(ctx *gin.Context) {
+func (h *ShortUrl) Redirect(ctx *gin.Context) {
 	url, ok := ctx.Params.Get("url")
 	if !ok {
 		ctx.JSON(http.StatusNotFound, nil)

@@ -2,12 +2,23 @@ package usecase
 
 import (
 	"errors"
+	"fmt"
+	"go-url-shortener/internal/repostiory/postgres"
 )
 
-type ShortUrl struct{}
+type ShortUrlUsecase interface {
+	Create(url string) (string, error)
+	Redirect(url string) (string, error)
+}
 
-func NewShortUrl() *ShortUrl {
-	return &ShortUrl{}
+type ShortUrl struct {
+	Repo *postgres.UrlRepository
+}
+
+func NewShortUrl(repo *postgres.UrlRepository) *ShortUrl {
+	return &ShortUrl{
+		Repo: repo,
+	}
 }
 
 func (s *ShortUrl) Create(url string) (string, error) {
