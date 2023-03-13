@@ -27,13 +27,17 @@ func (s *ShortUrl) Create(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(id)
-	return "abc", nil
+	return Encode(id), nil
 }
 
 func (s *ShortUrl) Redirect(url string) (string, error) {
-	if url == "invalid" {
+	if len(url) > 7 {
 		return "", errors.New("Short URL not found")
 	}
+	id, err := Decode(url)
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(id)
 	return "https://example.com/foobar", nil
 }

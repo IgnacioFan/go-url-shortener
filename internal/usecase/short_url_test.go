@@ -23,7 +23,7 @@ func TestShortUrlCreate(t *testing.T) {
 		{
 			"Create with URL",
 			"https://example.com/foobar",
-			"abc",
+			"SlC",
 			nil,
 		},
 		{
@@ -35,7 +35,7 @@ func TestShortUrlCreate(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			urlMock.On("Create", test.input).Return(uint64(1), nil)
+			urlMock.On("Create", test.input).Return(uint64(10000), nil)
 
 			res, err := usecase.Create(test.input)
 			if test.expectedErr != nil {
@@ -58,15 +58,21 @@ func TestShortUrlRedirect(t *testing.T) {
 	}{
 		{
 			"Redirect with valid short URL",
-			"valid",
+			"SlC",
 			"https://example.com/foobar",
 			nil,
 		},
 		{
 			"Invalid short URL",
-			"invalid",
+			"abcdefgh",
 			"",
 			errors.New("Short URL not found"),
+		},
+		{
+			"With non-alphanumeric characters",
+			"AB]C",
+			"",
+			errors.New("Invalid character: ]"),
 		},
 	}
 	for _, test := range tests {
