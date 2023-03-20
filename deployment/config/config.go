@@ -1,18 +1,29 @@
 package config
 
 import (
-	"fmt"
 	"log"
+	"time"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
 	Postgres PostgresConfig `mapstructure:"postgres"`
+	Redis    RedisConfig    `mapstructure:"redis"`
 }
 
 type PostgresConfig struct {
 	DSN string `mapstructure:"dsn"`
+}
+
+type RedisConfig struct {
+	Host         string        `mapstructure:"host"`
+	Port         uint          `mapstructure:"port"`
+	DB           int           `mapstructure:"db"`
+	Password     string        `mapstructure:"password"`
+	MinIdleConns int           `mapstructure:"min_idle_conns"`
+	MaxPoolSize  int           `mapstructure:"max_pool_size"`
+	DialTimeout  time.Duration `mapstructure:"dial_timeout"`
 }
 
 func New() (*Config, error) {
@@ -29,6 +40,5 @@ func New() (*Config, error) {
 	if err != nil {
 		return &config, err
 	}
-	fmt.Println(config)
 	return &config, nil
 }
