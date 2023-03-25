@@ -1,0 +1,6 @@
+.env
+.git
+docker-comose.yml
+/doc
+/tmp
+/note
