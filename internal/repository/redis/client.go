@@ -1,29 +1,22 @@
 package redis
 
 import (
-	"context"
 	"fmt"
 	"go-url-shortener/deployment/config"
 
-	"github.com/go-redis/redis/v8"
-	"github.com/pkg/errors"
+	"github.com/go-redis/redis"
 )
 
-func InitClient() (*redis.Client, error) {
+func InitClient() *redis.Client {
 	config, err := config.New()
 	client := redis.NewClient(&redis.Options{
-		Addr:         fmt.Sprintf("%s:%d", config.Redis.Host, config.Redis.Port),
-		Password:     config.Redis.Password,
-		DB:           config.Redis.DB,
-		PoolSize:     config.Redis.MaxPoolSize,
-		MinIdleConns: config.Redis.MinIdleConns,
+		Addr: fmt.Sprintf("%s:%d", config.Redis.Host, config.Redis.Port),
 	})
-	ctx, cancel := context.WithTimeout(context.Background(), config.Redis.DialTimeout)
-	defer cancel()
-	_, err = client.Ping(ctx).Result()
+	pong, err := client.Ping().Result()
 	if err != nil {
-		return nil, errors.Wrap(err, "redis error:")
+		fmt.Println("redis error:", err)
 	}
+	fmt.Println(pong)
 
-	return client, nil
+	return client
 }

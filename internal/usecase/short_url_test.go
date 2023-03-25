@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"context"
 	"errors"
 	"go-url-shortener/internal/mocks"
 	"testing"
@@ -12,10 +11,9 @@ import (
 var (
 	encodedUrl  = "SlC"
 	originalUrl = "https://example.com/foobar"
-	ctx         context.Context
 	urlRepo     = new(mocks.UrlRepository)
 	urlCache    = new(mocks.UrlCache)
-	usecase     = NewShortUrl(urlCache, ctx, urlRepo)
+	usecase     = NewShortUrl(urlCache, urlRepo)
 )
 
 func TestShortUrlCreate(t *testing.T) {
@@ -80,7 +78,7 @@ func TestShortUrlRedirect(t *testing.T) {
 			"When url is cached, redirect with valid short URL",
 			"SlC",
 			func(cache *mocks.UrlCache, repo *mocks.UrlRepository) {
-				cache.On("Get", ctx, "SlC").Return(originalUrl, nil)
+				cache.On("Get", "SlC").Return(originalUrl, nil)
 			},
 			originalUrl,
 			nil,
@@ -89,9 +87,9 @@ func TestShortUrlRedirect(t *testing.T) {
 			"When entry doesn't exist, ReadThruCache",
 			"ABC",
 			func(cache *mocks.UrlCache, repo *mocks.UrlRepository) {
-				cache.On("Get", ctx, "ABC").Return("", errors.New("No entry"))
+				cache.On("Get", "ABC").Return("", errors.New("No entry"))
 				repo.On("Find", uint64(7750)).Return(originalUrl, nil)
-				cache.On("Set", ctx, "ABC", originalUrl).Return(nil)
+				cache.On("Set", "ABC", originalUrl).Return(nil)
 			},
 			originalUrl,
 			nil,

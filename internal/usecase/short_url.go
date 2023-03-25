@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"context"
 	"errors"
 	"go-url-shortener/internal/repository/postgres"
 	"go-url-shortener/internal/repository/redis"
@@ -14,16 +13,14 @@ type ShortUrlUsecase interface {
 }
 
 type ShortUrl struct {
-	Client  redis.UrlCache
-	Context context.Context
-	Repo    postgres.UrlRepository
+	Cache redis.UrlCache
+	Repo  postgres.UrlRepository
 }
 
-func NewShortUrl(client redis.UrlCache, ctx context.Context, repo postgres.UrlRepository) *ShortUrl {
+func NewShortUrl(cache redis.UrlCache, repo postgres.UrlRepository) *ShortUrl {
 	return &ShortUrl{
-		Client:  client,
-		Context: ctx,
-		Repo:    repo,
+		Cache: cache,
+		Repo:  repo,
 	}
 }
 
@@ -47,7 +44,7 @@ func (s *ShortUrl) Redirect(encodedUrl string) (string, error) {
 		return "", err
 	}
 
-	originalUrl, err := s.Client.Get(s.Context, encodedUrl)
+	originalUrl, err := s.Cache.Get(encodedUrl)
 	if err != nil {
 		if err.Error() == "No entry" {
 			return s.ReadThruCache(id, encodedUrl)
@@ -65,7 +62,7 @@ func (s *ShortUrl) ReadThruCache(id uint64, encodedUrl string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if err = s.Client.Set(s.Context, encodedUrl, origanalUrl); err != nil {
+	if err = s.Cache.Set(encodedUrl, origanalUrl); err != nil {
 		log.Fatalf("Failed to set cache entry: %v", err)
 	}
 	return origanalUrl, nil
