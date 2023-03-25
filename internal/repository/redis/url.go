@@ -2,12 +2,13 @@ package redis
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 )
 
-type UrlRepository interface {
+type UrlCache interface {
 	Get(ctx context.Context, key string) (string, error)
 	Set(ctx context.Context, key, val string) error
 }
@@ -17,11 +18,11 @@ type Url struct {
 }
 
 func (u *Url) Get(ctx context.Context, key string) (string, error) {
-	originalUrl, err := u.Client.Get(ctx, key).Result()
-	if err != nil {
-		return "", err
+	if str, err := u.Client.Get(ctx, key).Result(); err == redis.Nil {
+		return "", errors.New("No entry")
+	} else {
+		return str, err
 	}
-	return originalUrl, nil
 }
 
 func (u *Url) Set(ctx context.Context, key, val string) error {

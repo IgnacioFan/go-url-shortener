@@ -11,6 +11,7 @@ import (
 type UrlRepository interface {
 	Create(url string) (uint64, error)
 	FindBy(url string) (uint64, error)
+	Find(id uint64) (string, error)
 }
 
 type Url struct {
@@ -38,4 +39,12 @@ func (u *Url) FindBy(url string) (uint64, error) {
 		return 0, err
 	}
 	return res.ID, nil
+}
+
+func (u *Url) Find(id uint64) (string, error) {
+	res := &entity.Url{}
+	if err := u.DB.First(&res, id).Error; err != nil {
+		return "", err
+	}
+	return res.Url, nil
 }

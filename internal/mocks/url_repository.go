@@ -30,6 +30,27 @@ func (_m *UrlRepository) Create(url string) (uint64, error) {
 	return r0, r1
 }
 
+// Find provides a mock function with given fields: id
+func (_m *UrlRepository) Find(id uint64) (string, error) {
+	ret := _m.Called(id)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(uint64) string); ok {
+		r0 = rf(id)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint64) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // FindBy provides a mock function with given fields: url
 func (_m *UrlRepository) FindBy(url string) (uint64, error) {
 	ret := _m.Called(url)
