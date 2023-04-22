@@ -8,8 +8,13 @@ import (
 )
 
 type Config struct {
+	Http     HttpConfig     `mapstructure:"http"`
 	Postgres PostgresConfig `mapstructure:"postgres"`
 	Redis    RedisConfig    `mapstructure:"redis"`
+}
+
+type HttpConfig struct {
+	Port int `mapstructure:"port"`
 }
 
 type PostgresConfig struct {

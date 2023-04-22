@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"go-url-shortener/internal/delivery"
+	"go-url-shortener/internal/wire_inject/app"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -10,7 +11,7 @@ import (
 var (
 	ServerCmd = &cobra.Command{
 		Use:           "server",
-		Short:         "Initialize Url shortener",
+		Short:         "run Url Shortener",
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		Run:           runServerCmd,
@@ -18,6 +19,14 @@ var (
 )
 
 func runServerCmd(cmd *cobra.Command, args []string) {
-	application := delivery.NewHttpServer()
-	application.Run(fmt.Sprintf(":%d", 3000))
+	app, err := app.Initialize()
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	err = app.Start()
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 }

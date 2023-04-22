@@ -2,7 +2,7 @@ package redis
 
 import (
 	"fmt"
-	"go-url-shortener/deployment/config"
+	"go-url-shortener/config"
 
 	"github.com/go-redis/redis"
 )

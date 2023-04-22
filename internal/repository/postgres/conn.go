@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"go-url-shortener/deployment/config"
+	"go-url-shortener/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
