@@ -19,3 +19,8 @@ type ShortUrlRepository interface {
 	FindBy(url string) (uint64, error)
 	Find(id uint64) (string, error)
 }
+
+type ShortUrlUsecase interface {
+	Create(url string) (string, error)
+	Redirect(url string) (string, error)
+}

@@ -3,25 +3,24 @@ package shorturl
 import (
 	"errors"
 	"go-url-shortener/internal/entity"
-	"go-url-shortener/internal/usecase"
 	"go-url-shortener/internal/usecase/base62"
 	"go-url-shortener/pkg/redis"
 	"log"
 )
 
-type Impl struct {
+type ShortUrl struct {
 	Client redis.RedisClient
 	Repo   entity.ShortUrlRepository
 }
 
-func NewShortUrl(repo entity.ShortUrlRepository, client redis.RedisClient) usecase.ShortUrl {
-	return &Impl{
+func NewShortUrlUsecase(repo entity.ShortUrlRepository, client redis.RedisClient) entity.ShortUrlUsecase {
+	return &ShortUrl{
 		Client: client,
 		Repo:   repo,
 	}
 }
 
-func (i *Impl) Create(url string) (string, error) {
+func (i *ShortUrl) Create(url string) (string, error) {
 	if len(url) == 0 {
 		return "", errors.New("Url is empty")
 	}
@@ -32,7 +31,7 @@ func (i *Impl) Create(url string) (string, error) {
 	return base62.Encode(id), nil
 }
 
-func (i *Impl) Redirect(encodedUrl string) (string, error) {
+func (i *ShortUrl) Redirect(encodedUrl string) (string, error) {
 	if len(encodedUrl) > 7 {
 		return "", errors.New("Short URL not found")
 	}
@@ -54,7 +53,7 @@ func (i *Impl) Redirect(encodedUrl string) (string, error) {
 	}
 }
 
-func (i *Impl) ReadThruCache(id uint64, encodedUrl string) (string, error) {
+func (i *ShortUrl) ReadThruCache(id uint64, encodedUrl string) (string, error) {
 	origanalUrl, err := i.Repo.Find(id)
 	if err != nil {
 		return "", err

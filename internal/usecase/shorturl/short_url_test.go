@@ -13,7 +13,7 @@ var (
 	originalUrl = "https://example.com/foobar"
 	urlRepo     = new(mocks.UrlRepository)
 	urlClient   = new(mocks.UrlCache)
-	shortUrl    = NewShortUrl(urlRepo, urlClient)
+	shortUrl    = NewShortUrlUsecase(urlRepo, urlClient)
 )
 
 func TestShortUrlCreate(t *testing.T) {

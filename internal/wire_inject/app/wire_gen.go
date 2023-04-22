@@ -25,8 +25,8 @@ func Initialize() (Application, error) {
 	postgresPostgres := postgres.InitPostgres(configConfig)
 	shortUrlRepository := repository.NewShortUrlRepo(postgresPostgres)
 	redisClient := redis.InitClient(configConfig)
-	shortUrl := shorturl.NewShortUrl(shortUrlRepository, redisClient)
-	shortUrlHandler := handler.NewShortUrlHandler(shortUrl)
+	shortUrlUsecase := shorturl.NewShortUrlUsecase(shortUrlRepository, redisClient)
+	shortUrlHandler := handler.NewShortUrlHandler(shortUrlUsecase)
 	application := NewApplication(shortUrlHandler, configConfig)
 	return application, nil
 }

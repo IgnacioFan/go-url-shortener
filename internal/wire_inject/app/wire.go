@@ -19,7 +19,7 @@ func Initialize() (Application, error) {
 	wire.Build(
 		NewApplication,
 		handler.NewShortUrlHandler,
-		shorturl.NewShortUrl,
+		shorturl.NewShortUrlUsecase,
 		repository.NewShortUrlRepo,
 		postgres.InitPostgres,
 		redis.InitClient,

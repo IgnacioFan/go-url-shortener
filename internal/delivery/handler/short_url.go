@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"go-url-shortener/internal/usecase"
+	"go-url-shortener/internal/entity"
 	"net/http"
 	"time"
 
@@ -9,7 +9,7 @@ import (
 )
 
 type ShortUrlHandler struct {
-	ShortUrl usecase.ShortUrl
+	ShortUrl entity.ShortUrlUsecase
 }
 
 type ShortUrlResponse struct {
@@ -17,7 +17,7 @@ type ShortUrlResponse struct {
 	Expiration *time.Time `json:"expiration"`
 }
 
-func NewShortUrlHandler(shortUrl usecase.ShortUrl) *ShortUrlHandler {
+func NewShortUrlHandler(shortUrl entity.ShortUrlUsecase) *ShortUrlHandler {
 	return &ShortUrlHandler{ShortUrl: shortUrl}
 }
 
