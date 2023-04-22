@@ -53,8 +53,8 @@ func TestShortUrlCreate(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			test.runSQL(mock)
-			urlRepository := NewShortUrlRepo(db)
-			id, err := urlRepository.Create(test.input)
+			repository := NewShortUrlRepo(db)
+			id, err := repository.Create(test.input)
 
 			if err != nil {
 				assert.Equal(t, errors.New("record not found"), err)
@@ -86,8 +86,8 @@ func TestShortUrlFindBy(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			test.runSQL(mock)
-			urlRepository := NewShortUrlRepo(db)
-			id, err := urlRepository.FindBy(test.input)
+			repository := NewShortUrlRepo(db)
+			id, err := repository.FindBy(test.input)
 
 			if err != nil {
 				assert.Equal(t, errors.New("record not found"), err)
