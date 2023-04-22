@@ -1,4 +1,4 @@
-package usecase
+package shorturl
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ var (
 	originalUrl = "https://example.com/foobar"
 	urlRepo     = new(mocks.UrlRepository)
 	urlCache    = new(mocks.UrlCache)
-	usecase     = NewShortUrl(urlCache, urlRepo)
+	shortUrl    = NewShortUrl(urlCache, urlRepo)
 )
 
 func TestShortUrlCreate(t *testing.T) {
@@ -40,7 +40,7 @@ func TestShortUrlCreate(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			urlRepo.On("Create", test.input).Return(uint64(10000), nil)
 
-			res, err := usecase.Create(test.input)
+			res, err := shortUrl.Create(test.input)
 			if test.expectedErr != nil {
 				assert.Equal(t, test.expectedRes, res)
 				assert.Equal(t, test.expectedErr, err)
@@ -99,7 +99,7 @@ func TestShortUrlRedirect(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			test.mockFunc(urlCache, urlRepo)
 
-			res, err := usecase.Redirect(test.input)
+			res, err := shortUrl.Redirect(test.input)
 			if test.expectedErr != nil {
 				assert.Equal(t, test.expectedRes, res)
 				assert.Equal(t, test.expectedErr, err)

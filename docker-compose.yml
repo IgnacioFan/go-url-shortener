@@ -20,7 +20,7 @@ services:
     container_name: go-url-shortener
     restart: always
     ports:
-      - 8081:3000
+      - 3000:3000
     depends_on:
       - db
       - redis

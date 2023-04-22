@@ -32,9 +32,12 @@ type RedisConfig struct {
 }
 
 func New() (*Config, error) {
-	viper.AddConfigPath("./deployment/config")
+	// set the name of the config file (without extension)
 	viper.SetConfigName("default")
-	viper.SetConfigType("yaml")
+
+	// Set the search paths for the config file
+	viper.AddConfigPath("$HOME/go-url-shortener/deployment/config")
+	viper.AddConfigPath("./deployment/config")
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Failed to read config file: %v", err)

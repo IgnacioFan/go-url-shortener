@@ -9,7 +9,7 @@ import (
 )
 
 type ShortUrl struct {
-	ShortUrl usecase.ShortUrlUsecase
+	ShortUrl usecase.ShortUrl
 }
 
 type ShortUrlRequest struct {
@@ -22,7 +22,7 @@ type ShortUrlResponse struct {
 	Expiration *time.Time `json:"expiration"`
 }
 
-func NewShortUrlHandler(shortUrl usecase.ShortUrlUsecase) *ShortUrl {
+func NewShortUrlHandler(shortUrl usecase.ShortUrl) *ShortUrl {
 	return &ShortUrl{ShortUrl: shortUrl}
 }
 
