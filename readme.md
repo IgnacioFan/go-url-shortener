@@ -7,8 +7,9 @@ A URL shortener creates shorter aliases for long and complex URLs. Users can pas
 - `Cobra` as the command-line interface framework
 - `PostgreSQL` for storing relational data
 - `Redis` for building the cache layer
-- `Mockery` and `sqlMock` for supporting unit test
-- `Docker` for quickly setting up containerized services
+- `Mockery` and `sqlMock` for unit test
+- `Docker` for building containerized services and env
+- `Wire` for supporting components using dependency injection
 - `Github actions` for CI
 
 ## Installation and Setup
@@ -56,30 +57,6 @@ docker compose down
 ### API: Redirect to the original URL
 -  send a GET request to `http://localhost:3000/{shortcode}`, For example, `http://localhost:8080/abc` will redirect to `www.example.com/foo/bar?user=123`.
 
-## Project Structure
-```
-├── build/                  # docker build file
-├── cmd/
-│   ├── migrate.go          # sub-command interface for implementing schema migration
-│   ├── root.go             # main command interface
-│   └── server.go           # sub-command interface for booting up the Http Server
-├── deployment/
-│   ├── config/             # configuration code and files
-│   └── migration/          # migration code and files
-├── internal/
-│   ├── delivery/           # web layer
-│   │   ├── handler/        # HTTP request handlers for the API endpoints and their tests
-│   │   └── http_server.go  # HTTP server initializer and API routes settings
-│   ├── entity/             # domanin layer
-│   ├── mocks/              # contains generated mock files for different test purposes
-│   ├── repository
-│   │   ├── postgres/       # data access layer based on PostgreSQL
-│   │   └── redis/          # cache layer based on Redis
-│   └── usecase             # implemenation layer
-├── scripts
-└── main.go                 # main entry
-```
-
 ## Test
 
 We can run tests without `docker compose up`
@@ -102,3 +79,4 @@ go test -v -coverprofile=coverage.txt -cover ./internal/...
 - https://github.com/JamesYu608/piccollage-problem2-shorten-url
 - https://github.com/davidwu1997/ShortURL
 - https://www.youtube.com/watch?v=JQDHz72OA3c
+- https://github.com/vishnubob/wait-for-it (for script)
