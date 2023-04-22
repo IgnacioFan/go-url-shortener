@@ -4,18 +4,19 @@ import (
 	"errors"
 	"go-url-shortener/internal/entity"
 	"go-url-shortener/internal/repository"
+	"go-url-shortener/pkg/postgres"
 	"time"
 
 	"gorm.io/gorm"
 )
 
 type Impl struct {
-	DB *gorm.DB
+	postgres.Postgres
 }
 
-func NewUrlRepository(db *gorm.DB) repository.UrlRepository {
+func NewUrlRepository(postgres *postgres.Postgres) repository.UrlRepository {
 	return &Impl{
-		DB: db,
+		*postgres,
 	}
 }
 

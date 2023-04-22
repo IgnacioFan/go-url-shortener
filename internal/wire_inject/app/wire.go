@@ -6,7 +6,11 @@ package app
 
 import (
 	"go-url-shortener/config"
-	"go-url-shortener/internal/delivery"
+	"go-url-shortener/internal/delivery/handler"
+	"go-url-shortener/internal/repository/urlrepo"
+	"go-url-shortener/internal/usecase/shorturl"
+	"go-url-shortener/pkg/postgres"
+	"go-url-shortener/pkg/redis"
 
 	"github.com/google/wire"
 )
@@ -14,7 +18,11 @@ import (
 func Initialize() (Application, error) {
 	wire.Build(
 		NewApplication,
-		delivery.NewHttpServer,
+		handler.NewShortUrlHandler,
+		shorturl.NewShortUrl,
+		urlrepo.NewUrlRepository,
+		postgres.InitPostgres,
+		redis.InitClient,
 		config.New,
 	)
 	return Application{}, nil

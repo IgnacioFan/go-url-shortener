@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-url-shortener/config"
 	"go-url-shortener/internal/delivery"
+	"go-url-shortener/internal/delivery/handler"
 )
 
 type Application struct {
@@ -11,7 +12,9 @@ type Application struct {
 	Config     *config.Config
 }
 
-func NewApplication(server *delivery.HttpServer, config *config.Config) Application {
+func NewApplication(handler *handler.ShortUrlHandler, config *config.Config) Application {
+	server := delivery.NewHttpServer(handler)
+
 	return Application{
 		HttpServer: server,
 		Config:     config,

@@ -13,9 +13,7 @@ type Impl struct {
 	Client *redis.Client
 }
 
-func NewUrlClient() RedisClient {
-	config, err := config.New()
-
+func InitClient(config *config.Config) RedisClient {
 	client := redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d", config.Redis.Host, config.Redis.Port),
 	})

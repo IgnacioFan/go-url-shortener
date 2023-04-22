@@ -7,11 +7,16 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitConn() *gorm.DB {
-	config, err := config.New()
+type Postgres struct {
+	DB *gorm.DB
+}
+
+func InitPostgres(config *config.Config) *Postgres {
 	db, err := gorm.Open(postgres.Open(config.Postgres.DSN), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
-	return db
+	return &Postgres{
+		DB: db,
+	}
 }

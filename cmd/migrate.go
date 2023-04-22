@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"go-url-shortener/config"
 	"go-url-shortener/pkg/postgres"
 	"os"
 
@@ -19,8 +20,13 @@ var (
 )
 
 func runMigrateCmd(cmd *cobra.Command, args []string) {
-	err := postgres.NewMigrate()
+	config, err := config.New()
 	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	db := postgres.InitPostgres(config)
+	if err = db.NewMigrate(); err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
