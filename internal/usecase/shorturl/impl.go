@@ -2,22 +2,22 @@ package shorturl
 
 import (
 	"errors"
-	"go-url-shortener/internal/repository/postgres"
-	"go-url-shortener/internal/repository/redis"
+	"go-url-shortener/internal/repository"
 	"go-url-shortener/internal/usecase"
 	"go-url-shortener/internal/usecase/base62"
+	"go-url-shortener/pkg/redis"
 	"log"
 )
 
 type Impl struct {
-	Cache redis.UrlCache
-	Repo  postgres.UrlRepository
+	Client redis.RedisClient
+	Repo   repository.UrlRepository
 }
 
-func NewShortUrl(cache redis.UrlCache, repo postgres.UrlRepository) usecase.ShortUrl {
+func NewShortUrl(urlRepo repository.UrlRepository, urlClient redis.RedisClient) usecase.ShortUrl {
 	return &Impl{
-		Cache: cache,
-		Repo:  repo,
+		Client: urlClient,
+		Repo:   urlRepo,
 	}
 }
 
@@ -41,7 +41,7 @@ func (i *Impl) Redirect(encodedUrl string) (string, error) {
 		return "", err
 	}
 
-	originalUrl, err := i.Cache.Get(encodedUrl)
+	originalUrl, err := i.Client.Get(encodedUrl)
 	if err != nil {
 		if err.Error() == "No entry" {
 			return i.ReadThruCache(id, encodedUrl)
@@ -59,7 +59,7 @@ func (i *Impl) ReadThruCache(id uint64, encodedUrl string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if err = i.Cache.Set(encodedUrl, origanalUrl); err != nil {
+	if err = i.Client.Set(encodedUrl, origanalUrl); err != nil {
 		log.Fatalf("Failed to set cache entry: %v", err)
 	}
 	return origanalUrl, nil

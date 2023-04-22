@@ -2,17 +2,18 @@ package delivery
 
 import (
 	"go-url-shortener/internal/delivery/handler"
-	"go-url-shortener/internal/repository/postgres"
-	"go-url-shortener/internal/repository/redis"
+	"go-url-shortener/internal/repository/urlrepo"
 	"go-url-shortener/internal/usecase/shorturl"
+	"go-url-shortener/pkg/postgres"
+	"go-url-shortener/pkg/redis"
 
 	"github.com/gin-gonic/gin"
 )
 
 var (
-	urlRepo         = &postgres.Url{DB: postgres.InitConn()}
-	urlCache        = &redis.Url{Client: redis.InitClient()}
-	shortUrlUsecase = shorturl.NewShortUrl(urlCache, urlRepo)
+	urlRepo         = urlrepo.NewUrlRepository(postgres.InitConn())
+	urlClient       = redis.NewUrlClient()
+	shortUrlUsecase = shorturl.NewShortUrl(urlRepo, urlClient)
 	shortUrlHandler = handler.NewShortUrlHandler(shortUrlUsecase)
 )
 

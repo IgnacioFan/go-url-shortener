@@ -12,8 +12,8 @@ var (
 	encodedUrl  = "SlC"
 	originalUrl = "https://example.com/foobar"
 	urlRepo     = new(mocks.UrlRepository)
-	urlCache    = new(mocks.UrlCache)
-	shortUrl    = NewShortUrl(urlCache, urlRepo)
+	urlClient   = new(mocks.UrlCache)
+	shortUrl    = NewShortUrl(urlRepo, urlClient)
 )
 
 func TestShortUrlCreate(t *testing.T) {
@@ -97,7 +97,7 @@ func TestShortUrlRedirect(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			test.mockFunc(urlCache, urlRepo)
+			test.mockFunc(urlClient, urlRepo)
 
 			res, err := shortUrl.Redirect(test.input)
 			if test.expectedErr != nil {

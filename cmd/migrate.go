@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"go-url-shortener/internal/repository/postgres"
+	"go-url-shortener/pkg/postgres"
 	"os"
 
 	"github.com/spf13/cobra"

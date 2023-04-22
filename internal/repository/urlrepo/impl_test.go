@@ -1,4 +1,4 @@
-package postgres
+package urlrepo
 
 import (
 	"errors"
@@ -42,7 +42,7 @@ func TestUrlCreate(t *testing.T) {
 				t.Fatalf("Failed to use gorm to open DB connection: %s", err)
 			}
 			test.runSQL(mock)
-			urlRepository := Url{DB: orm}
+			urlRepository := NewUrlRepository(orm)
 			id, err := urlRepository.Create(test.input)
 
 			if err != nil {
@@ -81,7 +81,7 @@ func TestUrlFindBy(t *testing.T) {
 				t.Fatalf("Failed to use gorm to open DB connection: %s", err)
 			}
 			test.runSQL(mock)
-			urlRepository := Url{DB: orm}
+			urlRepository := NewUrlRepository(orm)
 			id, err := urlRepository.FindBy(test.input)
 
 			if err != nil {
