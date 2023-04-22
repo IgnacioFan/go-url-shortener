@@ -12,8 +12,8 @@ var (
 	encodedUrl  = "SlC"
 	originalUrl = "https://example.com/foobar"
 	urlRepo     = new(mocks.UrlRepository)
-	urlClient   = new(mocks.UrlCache)
-	shortUrl    = NewShortUrlUsecase(urlRepo, urlClient)
+	client      = new(mocks.RedisClient)
+	shortUrl    = NewShortUrlUsecase(urlRepo, client)
 )
 
 func TestShortUrlCreate(t *testing.T) {
@@ -56,29 +56,29 @@ func TestShortUrlRedirect(t *testing.T) {
 	tests := []struct {
 		name        string
 		input       string
-		mockFunc    func(cache *mocks.UrlCache, repo *mocks.UrlRepository)
+		mockFunc    func(client *mocks.RedisClient, repo *mocks.UrlRepository)
 		expectedRes string
 		expectedErr error
 	}{
 		{
 			"Invalid short URL",
 			"abcdefgh",
-			func(cache *mocks.UrlCache, repo *mocks.UrlRepository) {},
+			func(client *mocks.RedisClient, repo *mocks.UrlRepository) {},
 			"",
 			errors.New("Short URL not found"),
 		},
 		{
 			"With non-alphanumeric characters",
 			"AB]C",
-			func(cache *mocks.UrlCache, repo *mocks.UrlRepository) {},
+			func(client *mocks.RedisClient, repo *mocks.UrlRepository) {},
 			"",
 			errors.New("Invalid character: ]"),
 		},
 		{
 			"When url is cached, redirect with valid short URL",
 			"SlC",
-			func(cache *mocks.UrlCache, repo *mocks.UrlRepository) {
-				cache.On("Get", "SlC").Return(originalUrl, nil)
+			func(client *mocks.RedisClient, repo *mocks.UrlRepository) {
+				client.On("Get", "SlC").Return(originalUrl, nil)
 			},
 			originalUrl,
 			nil,
@@ -86,10 +86,10 @@ func TestShortUrlRedirect(t *testing.T) {
 		{
 			"When entry doesn't exist, ReadThruCache",
 			"ABC",
-			func(cache *mocks.UrlCache, repo *mocks.UrlRepository) {
-				cache.On("Get", "ABC").Return("", errors.New("No entry"))
+			func(client *mocks.RedisClient, repo *mocks.UrlRepository) {
+				client.On("Get", "ABC").Return("", errors.New("No entry"))
 				repo.On("Find", uint64(7750)).Return(originalUrl, nil)
-				cache.On("Set", "ABC", originalUrl).Return(nil)
+				client.On("Set", "ABC", originalUrl).Return(nil)
 			},
 			originalUrl,
 			nil,
@@ -97,7 +97,7 @@ func TestShortUrlRedirect(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			test.mockFunc(urlClient, urlRepo)
+			test.mockFunc(client, urlRepo)
 
 			res, err := shortUrl.Redirect(test.input)
 			if test.expectedErr != nil {
