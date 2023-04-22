@@ -2,7 +2,7 @@ package entity
 
 import "time"
 
-type Url struct {
+type ShortUrl struct {
 	ID         uint64
 	Url        string `gorm:"type:varchar(1024) not null"`
 	Expired_At time.Time
@@ -10,7 +10,7 @@ type Url struct {
 	UpdatedAt  time.Time
 }
 
-func (s *Url) TableName() string {
+func (s *ShortUrl) TableName() string {
 	return "urls"
 }
 

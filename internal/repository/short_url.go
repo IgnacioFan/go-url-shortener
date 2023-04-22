@@ -27,7 +27,7 @@ func (i *ShortUrl) Create(url string) (uint64, error) {
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return 0, err
 	}
-	res := &entity.Url{Url: url, CreatedAt: time.Now(), UpdatedAt: time.Now()}
+	res := &entity.ShortUrl{Url: url, CreatedAt: time.Now(), UpdatedAt: time.Now()}
 	if err := i.DB.Create(res).Error; err != nil {
 		return 0, err
 	}
@@ -35,7 +35,7 @@ func (i *ShortUrl) Create(url string) (uint64, error) {
 }
 
 func (i *ShortUrl) FindBy(url string) (uint64, error) {
-	res := &entity.Url{}
+	res := &entity.ShortUrl{}
 	if err := i.DB.Where("url = ?", url).First(res).Error; err != nil {
 		return 0, err
 	}
@@ -43,7 +43,7 @@ func (i *ShortUrl) FindBy(url string) (uint64, error) {
 }
 
 func (i *ShortUrl) Find(id uint64) (string, error) {
-	res := &entity.Url{}
+	res := &entity.ShortUrl{}
 	if err := i.DB.First(&res, id).Error; err != nil {
 		return "", err
 	}
