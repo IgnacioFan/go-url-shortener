@@ -9,7 +9,7 @@ package app
 import (
 	"go-url-shortener/config"
 	"go-url-shortener/internal/delivery/handler"
-	"go-url-shortener/internal/repository/urlrepo"
+	"go-url-shortener/internal/repository"
 	"go-url-shortener/internal/usecase/shorturl"
 	"go-url-shortener/pkg/postgres"
 	"go-url-shortener/pkg/redis"
@@ -23,9 +23,9 @@ func Initialize() (Application, error) {
 		return Application{}, err
 	}
 	postgresPostgres := postgres.InitPostgres(configConfig)
-	urlRepository := urlrepo.NewUrlRepository(postgresPostgres)
+	shortUrlRepository := repository.NewShortUrlRepo(postgresPostgres)
 	redisClient := redis.InitClient(configConfig)
-	shortUrl := shorturl.NewShortUrl(urlRepository, redisClient)
+	shortUrl := shorturl.NewShortUrl(shortUrlRepository, redisClient)
 	shortUrlHandler := handler.NewShortUrlHandler(shortUrl)
 	application := NewApplication(shortUrlHandler, configConfig)
 	return application, nil

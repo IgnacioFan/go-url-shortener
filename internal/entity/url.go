@@ -13,3 +13,9 @@ type Url struct {
 func (s *Url) TableName() string {
 	return "urls"
 }
+
+type ShortUrlRepository interface {
+	Create(url string) (uint64, error)
+	FindBy(url string) (uint64, error)
+	Find(id uint64) (string, error)
+}

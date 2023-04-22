@@ -1,26 +1,25 @@
-package urlrepo
+package repository
 
 import (
 	"errors"
 	"go-url-shortener/internal/entity"
-	"go-url-shortener/internal/repository"
 	"go-url-shortener/pkg/postgres"
 	"time"
 
 	"gorm.io/gorm"
 )
 
-type Impl struct {
+type ShortUrl struct {
 	postgres.Postgres
 }
 
-func NewUrlRepository(postgres *postgres.Postgres) repository.UrlRepository {
-	return &Impl{
+func NewShortUrlRepo(postgres *postgres.Postgres) entity.ShortUrlRepository {
+	return &ShortUrl{
 		*postgres,
 	}
 }
 
-func (i *Impl) Create(url string) (uint64, error) {
+func (i *ShortUrl) Create(url string) (uint64, error) {
 	id, err := i.FindBy(url)
 	if err == nil {
 		return id, nil
@@ -35,7 +34,7 @@ func (i *Impl) Create(url string) (uint64, error) {
 	return res.ID, nil
 }
 
-func (i *Impl) FindBy(url string) (uint64, error) {
+func (i *ShortUrl) FindBy(url string) (uint64, error) {
 	res := &entity.Url{}
 	if err := i.DB.Where("url = ?", url).First(res).Error; err != nil {
 		return 0, err
@@ -43,7 +42,7 @@ func (i *Impl) FindBy(url string) (uint64, error) {
 	return res.ID, nil
 }
 
-func (i *Impl) Find(id uint64) (string, error) {
+func (i *ShortUrl) Find(id uint64) (string, error) {
 	res := &entity.Url{}
 	if err := i.DB.First(&res, id).Error; err != nil {
 		return "", err

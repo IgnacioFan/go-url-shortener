@@ -1,9 +1,11 @@
-package urlrepo
+package repository
 
 import (
 	"errors"
 	"regexp"
 	"testing"
+
+	_pkg "go-url-shortener/pkg/postgres"
 
 	"github.com/go-playground/assert/v2"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
@@ -11,7 +13,24 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestUrlCreate(t *testing.T) {
+func MockDB() (*_pkg.Postgres, sqlmock.Sqlmock) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		panic(err)
+	}
+	orm, err := gorm.Open(postgres.New(postgres.Config{DriverName: "postgres", Conn: db}), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
+	conn := &_pkg.Postgres{
+		DB: orm,
+	}
+	return conn, mock
+}
+
+func TestShortUrlCreate(t *testing.T) {
+	db, mock := MockDB()
+
 	tests := []struct {
 		name   string
 		input  string
@@ -33,16 +52,8 @@ func TestUrlCreate(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New()
-			if err != nil {
-				t.Fatalf("Failed to setup sqlmock: %s", err)
-			}
-			orm, err := gorm.Open(postgres.New(postgres.Config{DriverName: "postgres", Conn: db}), &gorm.Config{})
-			if err != nil {
-				t.Fatalf("Failed to use gorm to open DB connection: %s", err)
-			}
 			test.runSQL(mock)
-			urlRepository := NewUrlRepository(orm)
+			urlRepository := NewShortUrlRepo(db)
 			id, err := urlRepository.Create(test.input)
 
 			if err != nil {
@@ -54,7 +65,9 @@ func TestUrlCreate(t *testing.T) {
 	}
 }
 
-func TestUrlFindBy(t *testing.T) {
+func TestShortUrlFindBy(t *testing.T) {
+	db, mock := MockDB()
+
 	tests := []struct {
 		name   string
 		input  string
@@ -72,16 +85,8 @@ func TestUrlFindBy(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			db, mock, err := sqlmock.New()
-			if err != nil {
-				t.Fatalf("Failed to setup sqlmock: %s", err)
-			}
-			orm, err := gorm.Open(postgres.New(postgres.Config{DriverName: "postgres", Conn: db}), &gorm.Config{})
-			if err != nil {
-				t.Fatalf("Failed to use gorm to open DB connection: %s", err)
-			}
 			test.runSQL(mock)
-			urlRepository := NewUrlRepository(orm)
+			urlRepository := NewShortUrlRepo(db)
 			id, err := urlRepository.FindBy(test.input)
 
 			if err != nil {

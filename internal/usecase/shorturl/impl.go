@@ -2,7 +2,7 @@ package shorturl
 
 import (
 	"errors"
-	"go-url-shortener/internal/repository"
+	"go-url-shortener/internal/entity"
 	"go-url-shortener/internal/usecase"
 	"go-url-shortener/internal/usecase/base62"
 	"go-url-shortener/pkg/redis"
@@ -11,13 +11,13 @@ import (
 
 type Impl struct {
 	Client redis.RedisClient
-	Repo   repository.UrlRepository
+	Repo   entity.ShortUrlRepository
 }
 
-func NewShortUrl(urlRepo repository.UrlRepository, urlClient redis.RedisClient) usecase.ShortUrl {
+func NewShortUrl(repo entity.ShortUrlRepository, client redis.RedisClient) usecase.ShortUrl {
 	return &Impl{
-		Client: urlClient,
-		Repo:   urlRepo,
+		Client: client,
+		Repo:   repo,
 	}
 }
 
