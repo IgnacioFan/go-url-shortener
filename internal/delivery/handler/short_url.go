@@ -5,7 +5,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
+)
+
+var (
+	codeRegex = "^[a-zA-Z0-9]{1,7}$"
 )
 
 type ShortUrlHandler struct {
@@ -27,29 +32,30 @@ func NewShortUrlHandler(shortUrl entity.ShortUrlUsecase) *ShortUrlHandler {
 }
 
 func (h *ShortUrlHandler) Create(ctx *gin.Context) {
-	request := &ShortUrlRequest{}
-	if err := ctx.BindJSON(request); err != nil {
-		ctx.JSON(http.StatusNotFound, invalidParams)
+	req := &ShortUrlRequest{}
+	if err := ctx.BindJSON(req); err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-
-	url, err := h.ShortUrl.Create(request.Url)
+	if !govalidator.IsURL(req.Url) {
+		ctx.JSON(http.StatusBadRequest, invalidParams)
+		return
+	}
+	url, err := h.ShortUrl.Create(req.Url)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &ErrorResponse{ErrorMessage: err.Error()})
 		return
 	}
-
-	response := &Response{
+	ctx.JSON(http.StatusOK, &Response{
 		Message: "Short URL created successfully",
 		Data:    ShortUrlResponse{UrlID: url},
-	}
-	ctx.JSON(http.StatusOK, response)
+	})
 }
 
 func (h *ShortUrlHandler) Redirect(ctx *gin.Context) {
-	url, ok := ctx.Params.Get("url")
-	if !ok {
-		ctx.JSON(http.StatusNotFound, invalidParams)
+	url, ok := ctx.Params.Get("code")
+	if !ok || !govalidator.Matches(url, codeRegex) {
+		ctx.JSON(http.StatusBadRequest, invalidParams)
 		return
 	}
 	originalURL, err := h.ShortUrl.Redirect(url)
@@ -62,7 +68,7 @@ func (h *ShortUrlHandler) Redirect(ctx *gin.Context) {
 
 func (h *ShortUrlHandler) Delete(ctx *gin.Context) {
 	code, ok := ctx.Params.Get("code")
-	if len(code) > 7 || !ok {
+	if !ok || !govalidator.Matches(code, codeRegex) {
 		ctx.JSON(http.StatusBadRequest, invalidParams)
 		return
 	}

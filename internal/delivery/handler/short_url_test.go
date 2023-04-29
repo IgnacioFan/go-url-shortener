@@ -45,12 +45,14 @@ func TestShortURLHandlerCreate(t *testing.T) {
 			},
 		},
 		{
-			"when url is empty",
-			map[string]string{},
-			func() { shortUrlMock.On("Create", "").Return("", errors.New("Url is empty")) },
+			"when url is invalid",
+			map[string]string{
+				"url": "abc",
+			},
+			func() {},
 			&Expected{
-				Status: http.StatusNotFound,
-				Body:   `{"error_message":"Url is empty"}`,
+				Status: http.StatusBadRequest,
+				Body:   `{"error_message":"Invalid params."}`,
 			},
 		},
 	}
@@ -86,8 +88,8 @@ func TestShortURLHandlerRedirect(t *testing.T) {
 	}{
 		{
 			"when success",
-			"valid",
-			func() { shortUrlMock.On("Redirect", "valid").Return("https://example.com/foobar", nil) },
+			"abc",
+			func() { shortUrlMock.On("Redirect", "abc").Return("https://example.com/foobar", nil) },
 			&Expected{
 				Status: http.StatusFound,
 				Body:   "https://example.com/foobar",
@@ -95,11 +97,29 @@ func TestShortURLHandlerRedirect(t *testing.T) {
 		},
 		{
 			"when url not found",
-			"invalid",
-			func() { shortUrlMock.On("Redirect", "invalid").Return("", errors.New("Short URL not found")) },
+			"test",
+			func() { shortUrlMock.On("Redirect", "test").Return("", errors.New("Short URL not found.")) },
 			&Expected{
 				Status: http.StatusNotFound,
-				Body:   `{"error_message":"Short URL not found"}`,
+				Body:   `{"error_message":"Short URL not found."}`,
+			},
+		},
+		{
+			"when the length of code exceeds 7",
+			"Abcd1234",
+			func() {},
+			&Expected{
+				Status: http.StatusBadRequest,
+				Body:   `{"error_message":"Invalid params."}`,
+			},
+		},
+		{
+			"when code contians non-alphanumeric chars",
+			"A!,_b",
+			func() {},
+			&Expected{
+				Status: http.StatusBadRequest,
+				Body:   `{"error_message":"Invalid params."}`,
 			},
 		},
 	}
@@ -112,7 +132,7 @@ func TestShortURLHandlerRedirect(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 			c.Request = req
 
-			c.Params = append(c.Params, gin.Param{Key: "url", Value: test.Input})
+			c.Params = append(c.Params, gin.Param{Key: "code", Value: test.Input})
 
 			test.RunMock()
 			handler.Redirect(c)
@@ -155,7 +175,7 @@ func TestShortURLHandlerDelete(t *testing.T) {
 			},
 		},
 		{
-			"when code exceeds max length",
+			"when the length of code exceeds 7",
 			"abcdefgh",
 			func() {},
 			&Expected{
