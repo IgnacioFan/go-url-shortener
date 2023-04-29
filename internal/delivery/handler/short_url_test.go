@@ -28,27 +28,30 @@ func TestShortURLHandlerCreate(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	tests := []struct {
-		Name        string
-		Input       map[string]string
-		MockRes     string
-		ExpectedRes string
-		ExpectedErr error
+		Name     string
+		Input    map[string]string
+		RunMock  func()
+		Expected *Expected
 	}{
 		{
-			"Create with valid params",
+			"when success",
 			map[string]string{
 				"url": "https://example.com/foobar",
 			},
-			"abc",
-			`{"message":"Short URL created successfully","data":{"short_url":"abc","expiration":null}}`,
-			nil,
+			func() { shortUrlMock.On("Create", "https://example.com/foobar").Return("abc", nil) },
+			&Expected{
+				Status: http.StatusOK,
+				Body:   `{"message":"Short URL created successfully","data":{"short_url":"abc","expiration":null}}`,
+			},
 		},
 		{
-			"Create with invalid params",
+			"when url is empty",
 			map[string]string{},
-			"",
-			`{"error_message":"Url is empty"}`,
-			errors.New("Url is empty"),
+			func() { shortUrlMock.On("Create", "").Return("", errors.New("Url is empty")) },
+			&Expected{
+				Status: http.StatusNotFound,
+				Body:   `{"error_message":"Url is empty"}`,
+			},
 		},
 	}
 	for _, test := range tests {
@@ -63,16 +66,11 @@ func TestShortURLHandlerCreate(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 			c.Request = req
 
-			shortUrlMock.On("Create", test.Input["url"]).Return(test.MockRes, test.ExpectedErr)
+			test.RunMock()
 			handler.Create(c)
 
-			if test.ExpectedErr != nil {
-				assert.Equal(t, http.StatusNotFound, w.Code)
-				assert.Equal(t, test.ExpectedRes, w.Body.String())
-			} else {
-				assert.Equal(t, http.StatusOK, w.Code)
-				assert.Equal(t, test.ExpectedRes, w.Body.String())
-			}
+			assert.Equal(t, test.Expected.Status, w.Code)
+			assert.Equal(t, test.Expected.Body, w.Body.String())
 		})
 	}
 }
@@ -81,25 +79,28 @@ func TestShortURLHandlerRedirect(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	tests := []struct {
-		Name        string
-		Input       string
-		MockRes     string
-		ExpectedRes string
-		ExpectedErr error
+		Name     string
+		Input    string
+		RunMock  func()
+		Expected *Expected
 	}{
 		{
-			"Redirect with valid params",
+			"when success",
 			"valid",
-			"https://example.com/foobar",
-			"https://example.com/foobar",
-			nil,
+			func() { shortUrlMock.On("Redirect", "valid").Return("https://example.com/foobar", nil) },
+			&Expected{
+				Status: http.StatusFound,
+				Body:   "https://example.com/foobar",
+			},
 		},
 		{
-			"Redirect with invalid params",
+			"when url not found",
 			"invalid",
-			"",
-			`{"error_message":"Short URL not found"}`,
-			errors.New("Short URL not found"),
+			func() { shortUrlMock.On("Redirect", "invalid").Return("", errors.New("Short URL not found")) },
+			&Expected{
+				Status: http.StatusNotFound,
+				Body:   `{"error_message":"Short URL not found"}`,
+			},
 		},
 	}
 	for _, test := range tests {
@@ -113,15 +114,14 @@ func TestShortURLHandlerRedirect(t *testing.T) {
 
 			c.Params = append(c.Params, gin.Param{Key: "url", Value: test.Input})
 
-			shortUrlMock.On("Redirect", test.Input).Return(test.ExpectedRes, test.ExpectedErr)
+			test.RunMock()
 			handler.Redirect(c)
 
-			if test.ExpectedErr != nil {
-				assert.Equal(t, http.StatusNotFound, w.Code)
-				assert.Equal(t, test.ExpectedRes, w.Body.String())
+			assert.Equal(t, test.Expected.Status, w.Code)
+			if test.Expected.Status == http.StatusFound {
+				assert.Equal(t, test.Expected.Body, w.Header().Get("Location"))
 			} else {
-				assert.Equal(t, http.StatusFound, w.Code)
-				assert.Equal(t, test.ExpectedRes, w.Header().Get("Location"))
+				assert.Equal(t, test.Expected.Body, w.Body.String())
 			}
 		})
 	}
