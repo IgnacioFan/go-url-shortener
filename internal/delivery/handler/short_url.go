@@ -12,6 +12,11 @@ type ShortUrlHandler struct {
 	ShortUrl entity.ShortUrlUsecase
 }
 
+type ShortUrlRequest struct {
+	Url                 string `json:"url"`
+	ExpirationlenInMins int    `json:"expiration_len_in_mins"`
+}
+
 type ShortUrlResponse struct {
 	UrlID      string     `json:"short_url"`
 	Expiration *time.Time `json:"expiration"`
@@ -53,4 +58,19 @@ func (h *ShortUrlHandler) Redirect(ctx *gin.Context) {
 		return
 	}
 	ctx.Redirect(http.StatusFound, originalURL)
+}
+
+func (h *ShortUrlHandler) Delete(ctx *gin.Context) {
+	code, ok := ctx.Params.Get("code")
+	if len(code) > 7 || !ok {
+		ctx.JSON(http.StatusBadRequest, invalidParams)
+		return
+	}
+	if err := h.ShortUrl.Delete(code); err != nil {
+		ctx.JSON(http.StatusNotFound, &ErrorResponse{ErrorMessage: err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, &Response{
+		Message: "URL deleted successfully.",
+	})
 }

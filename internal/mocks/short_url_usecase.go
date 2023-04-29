@@ -30,6 +30,20 @@ func (_m *ShortUrlUsecase) Create(url string) (string, error) {
 	return r0, r1
 }
 
+// Delete provides a mock function with given fields: code
+func (_m *ShortUrlUsecase) Delete(code string) error {
+	ret := _m.Called(code)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(code)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // Redirect provides a mock function with given fields: url
 func (_m *ShortUrlUsecase) Redirect(url string) (string, error) {
 	ret := _m.Called(url)

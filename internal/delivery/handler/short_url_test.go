@@ -19,6 +19,11 @@ var (
 	handler      = NewShortUrlHandler(shortUrlMock)
 )
 
+type Expected struct {
+	Status int
+	Body   string
+}
+
 func TestShortURLHandlerCreate(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
@@ -118,6 +123,62 @@ func TestShortURLHandlerRedirect(t *testing.T) {
 				assert.Equal(t, http.StatusFound, w.Code)
 				assert.Equal(t, test.ExpectedRes, w.Header().Get("Location"))
 			}
+		})
+	}
+}
+
+func TestShortURLHandlerDelete(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	tests := []struct {
+		Name     string
+		Input    string
+		RunMock  func()
+		Expected *Expected
+	}{
+		{
+			"when success",
+			"abc",
+			func() { shortUrlMock.On("Delete", "abc").Return(nil) },
+			&Expected{
+				Status: http.StatusOK,
+				Body:   `{"message":"URL deleted successfully.","data":null}`,
+			},
+		},
+		{
+			"when url not found",
+			"123",
+			func() { shortUrlMock.On("Delete", "123").Return(errors.New("URL not found.")) },
+			&Expected{
+				Status: http.StatusNotFound,
+				Body:   `{"error_message":"URL not found."}`,
+			},
+		},
+		{
+			"when code exceeds max length",
+			"abcdefgh",
+			func() {},
+			&Expected{
+				Status: http.StatusBadRequest,
+				Body:   `{"error_message":"Invalid params."}`,
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+
+			req, _ := http.NewRequest("DELETE", fmt.Sprintf("/api/v1/urls/%s", test.Input), nil)
+
+			c, _ := gin.CreateTestContext(w)
+			c.Request = req
+			c.Params = append(c.Params, gin.Param{Key: "code", Value: test.Input})
+
+			test.RunMock()
+			handler.Delete(c)
+
+			assert.Equal(t, test.Expected.Status, w.Code)
+			assert.Equal(t, test.Expected.Body, w.Body.String())
 		})
 	}
 }

@@ -63,3 +63,7 @@ func (i *ShortUrl) ReadThruCache(id uint64, encodedUrl string) (string, error) {
 	}
 	return origanalUrl, nil
 }
+
+func (i *ShortUrl) Delete(code string) error {
+	return nil
+}

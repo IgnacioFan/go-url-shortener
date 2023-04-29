@@ -23,4 +23,5 @@ type ShortUrlRepository interface {
 type ShortUrlUsecase interface {
 	Create(url string) (string, error)
 	Redirect(url string) (string, error)
+	Delete(code string) error
 }
