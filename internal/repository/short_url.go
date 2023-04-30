@@ -51,5 +51,9 @@ func (i *ShortUrl) Find(id uint64) (string, error) {
 }
 
 func (i *ShortUrl) Delete(id uint64) error {
+	// res := &entity.ShortUrl{}
+	if err := i.DB.Delete(&entity.ShortUrl{}, id).Error; err != nil {
+		return err
+	}
 	return nil
 }
