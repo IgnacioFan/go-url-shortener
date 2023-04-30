@@ -11,7 +11,7 @@ type ShortUrl struct {
 }
 
 func (s *ShortUrl) TableName() string {
-	return "urls"
+	return "short_urls"
 }
 
 type ShortUrlRepository interface {

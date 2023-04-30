@@ -77,6 +77,17 @@ func TestShortUrlRedirect(t *testing.T) {
 			},
 		},
 		{
+			"when code is cached and url is empty string",
+			"B",
+			func() {
+				client.On("Get", "B").Return("", nil)
+			},
+			&Expected{
+				Res: "",
+				Err: errors.New("URL not found."),
+			},
+		},
+		{
 			"when code exists, find and cache",
 			"ABC",
 			func() {

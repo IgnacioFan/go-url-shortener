@@ -27,5 +27,5 @@ func (s *HttpServer) SetRouter() {
 		v1.POST("/urls", s.ShortUrl.Create)
 		v1.DELETE("/urls/:code", s.ShortUrl.Delete)
 	}
-	s.GET("/:url", s.ShortUrl.Redirect)
+	s.GET("/:code", s.ShortUrl.Redirect)
 }

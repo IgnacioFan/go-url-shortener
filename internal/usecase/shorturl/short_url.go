@@ -1,6 +1,7 @@
 package shorturl
 
 import (
+	"errors"
 	"go-url-shortener/internal/entity"
 	"go-url-shortener/internal/usecase/base62"
 	"go-url-shortener/pkg/redis"
@@ -34,16 +35,16 @@ func (i *ShortUrl) Redirect(code string) (string, error) {
 	}
 
 	url, err := i.Client.Get(code)
-	if err != nil && err.Error() == "No entry" {
+	if len(url) != 0 && err == nil {
+		return url, err
+	} else if len(url) == 0 && err == nil {
+		return "", errors.New("URL not found.")
+	} else if err != nil && err.Error() == "No entry" {
 		url, err := i.Repo.Find(id)
 		_ = i.Client.Set(code, url)
-
 		return url, err
-	} else if err != nil {
-		log.Fatalf("Failed to get cache entry: %v", err)
-		return "", err
 	} else {
-		return url, err
+		return "", err
 	}
 }
 
