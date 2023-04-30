@@ -43,3 +43,10 @@ func (i *Impl) Set(key, val string) error {
 	}
 	return nil
 }
+
+func (i *Impl) Del(key string) error {
+	if _, err := i.Client.Del(key).Result(); err != nil {
+		return err
+	}
+	return nil
+}

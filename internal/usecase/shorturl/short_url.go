@@ -1,7 +1,6 @@
 package shorturl
 
 import (
-	"errors"
 	"go-url-shortener/internal/entity"
 	"go-url-shortener/internal/usecase/base62"
 	"go-url-shortener/pkg/redis"
@@ -21,9 +20,6 @@ func NewShortUrlUsecase(repo entity.ShortUrlRepository, client redis.RedisClient
 }
 
 func (i *ShortUrl) Create(url string) (string, error) {
-	if len(url) == 0 {
-		return "", errors.New("Url is empty")
-	}
 	id, err := i.Repo.Create(url)
 	if err != nil {
 		return "", err
@@ -31,39 +27,36 @@ func (i *ShortUrl) Create(url string) (string, error) {
 	return base62.Encode(id), nil
 }
 
-func (i *ShortUrl) Redirect(encodedUrl string) (string, error) {
-	if len(encodedUrl) > 7 {
-		return "", errors.New("Short URL not found")
-	}
-	id, err := base62.Decode(encodedUrl)
+func (i *ShortUrl) Redirect(code string) (string, error) {
+	id, err := base62.Decode(code)
 	if err != nil {
 		return "", err
 	}
 
-	originalUrl, err := i.Client.Get(encodedUrl)
-	if err != nil {
-		if err.Error() == "No entry" {
-			return i.ReadThruCache(id, encodedUrl)
-		}
+	url, err := i.Client.Get(code)
+	if err != nil && err.Error() == "No entry" {
+		url, err := i.Repo.Find(id)
+		_ = i.Client.Set(code, url)
 
+		return url, err
+	} else if err != nil {
 		log.Fatalf("Failed to get cache entry: %v", err)
 		return "", err
 	} else {
-		return originalUrl, err
+		return url, err
 	}
-}
-
-func (i *ShortUrl) ReadThruCache(id uint64, encodedUrl string) (string, error) {
-	origanalUrl, err := i.Repo.Find(id)
-	if err != nil {
-		return "", err
-	}
-	if err = i.Client.Set(encodedUrl, origanalUrl); err != nil {
-		log.Fatalf("Failed to set cache entry: %v", err)
-	}
-	return origanalUrl, nil
 }
 
 func (i *ShortUrl) Delete(code string) error {
+	id, err := base62.Decode(code)
+	if err != nil {
+		return err
+	}
+	if err = i.Repo.Delete(id); err != nil {
+		return err
+	}
+	if err = i.Client.Del(code); err != nil {
+		return err
+	}
 	return nil
 }

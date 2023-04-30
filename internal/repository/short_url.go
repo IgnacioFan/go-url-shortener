@@ -49,3 +49,7 @@ func (i *ShortUrl) Find(id uint64) (string, error) {
 	}
 	return res.Url, nil
 }
+
+func (i *ShortUrl) Delete(id uint64) error {
+	return nil
+}

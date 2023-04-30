@@ -8,105 +8,146 @@ import (
 	"github.com/go-playground/assert/v2"
 )
 
-var (
-	encodedUrl  = "SlC"
-	originalUrl = "https://example.com/foobar"
-	urlRepo     = new(mocks.ShortUrlRepository)
-	client      = new(mocks.RedisClient)
-	shortUrl    = NewShortUrlUsecase(urlRepo, client)
-)
+type Expected struct {
+	Res interface{}
+	Err error
+}
 
 func TestShortUrlCreate(t *testing.T) {
+	repo, client := new(mocks.ShortUrlRepository), new(mocks.RedisClient)
+	usecase := NewShortUrlUsecase(repo, client)
+
 	tests := []struct {
-		name        string
-		input       string
-		expectedRes string
-		expectedErr error
+		name     string
+		input    string
+		runMock  func()
+		expected *Expected
 	}{
 		{
-			"Create with URL",
-			originalUrl,
-			"SlC",
-			nil,
-		},
-		{
-			"Without URL",
-			"",
-			"",
-			errors.New("Url is empty"),
+			"when success",
+			"https://example.com/foobar",
+			func() {
+				repo.On("Create", "https://example.com/foobar").Return(uint64(10000), nil)
+			},
+			&Expected{
+				Res: "SlC",
+				Err: nil,
+			},
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			urlRepo.On("Create", test.input).Return(uint64(10000), nil)
+			test.runMock()
 
-			res, err := shortUrl.Create(test.input)
-			if test.expectedErr != nil {
-				assert.Equal(t, test.expectedRes, res)
-				assert.Equal(t, test.expectedErr, err)
-			} else {
-				assert.Equal(t, test.expectedRes, res)
-				assert.Equal(t, test.expectedErr, err)
-			}
+			res, err := usecase.Create(test.input)
+			assert.Equal(t, test.expected.Res, res)
+			assert.Equal(t, test.expected.Err, err)
 		})
 	}
 }
 
 func TestShortUrlRedirect(t *testing.T) {
+	repo, client := new(mocks.ShortUrlRepository), new(mocks.RedisClient)
+	usecase := NewShortUrlUsecase(repo, client)
+
 	tests := []struct {
-		name        string
-		input       string
-		mockFunc    func(client *mocks.RedisClient, repo *mocks.ShortUrlRepository)
-		expectedRes string
-		expectedErr error
+		name     string
+		input    string
+		runMock  func()
+		expected *Expected
 	}{
 		{
-			"Invalid short URL",
-			"abcdefgh",
-			func(client *mocks.RedisClient, repo *mocks.ShortUrlRepository) {},
-			"",
-			errors.New("Short URL not found"),
-		},
-		{
-			"With non-alphanumeric characters",
+			"when code contains non-alphanumeric chars",
 			"AB]C",
-			func(client *mocks.RedisClient, repo *mocks.ShortUrlRepository) {},
-			"",
-			errors.New("Invalid character: ]"),
+			func() {},
+			&Expected{
+				Res: "",
+				Err: errors.New("Invalid character: ]"),
+			},
 		},
 		{
-			"When url is cached, redirect with valid short URL",
+			"when code is cached, return the cache entry",
 			"SlC",
-			func(client *mocks.RedisClient, repo *mocks.ShortUrlRepository) {
-				client.On("Get", "SlC").Return(originalUrl, nil)
+			func() {
+				client.On("Get", "SlC").Return("https://example.com/foobar", nil)
 			},
-			originalUrl,
-			nil,
+			&Expected{
+				Res: "https://example.com/foobar",
+				Err: nil,
+			},
 		},
 		{
-			"When entry doesn't exist, ReadThruCache",
+			"when code exists, find and cache",
 			"ABC",
-			func(client *mocks.RedisClient, repo *mocks.ShortUrlRepository) {
+			func() {
 				client.On("Get", "ABC").Return("", errors.New("No entry"))
-				repo.On("Find", uint64(7750)).Return(originalUrl, nil)
-				client.On("Set", "ABC", originalUrl).Return(nil)
+				repo.On("Find", uint64(7750)).Return("https://example.com/foobar", nil)
+				client.On("Set", "ABC", "https://example.com/foobar").Return(nil)
 			},
-			originalUrl,
-			nil,
+			&Expected{
+				Res: "https://example.com/foobar",
+				Err: nil,
+			},
+		},
+		{
+			"when code isn't found, find and cache",
+			"abc",
+			func() {
+				client.On("Get", "abc").Return("", errors.New("No entry"))
+				repo.On("Find", uint64(109332)).Return("", errors.New("URL not found."))
+				client.On("Set", "abc", "").Return(nil)
+			},
+			&Expected{
+				Res: "",
+				Err: errors.New("URL not found."),
+			},
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			test.mockFunc(client, urlRepo)
+			test.runMock()
 
-			res, err := shortUrl.Redirect(test.input)
-			if test.expectedErr != nil {
-				assert.Equal(t, test.expectedRes, res)
-				assert.Equal(t, test.expectedErr, err)
-			} else {
-				assert.Equal(t, test.expectedRes, res)
-				assert.Equal(t, test.expectedErr, err)
-			}
+			res, err := usecase.Redirect(test.input)
+			assert.Equal(t, test.expected.Res, res)
+			assert.Equal(t, test.expected.Err, err)
+		})
+	}
+}
+
+func TestShortUrlDelete(t *testing.T) {
+	repo, client := new(mocks.ShortUrlRepository), new(mocks.RedisClient)
+	usecase := NewShortUrlUsecase(repo, client)
+
+	tests := []struct {
+		name     string
+		input    string
+		runMock  func()
+		expected error
+	}{
+		{
+			"when successs",
+			"SlC",
+			func() {
+				repo.On("Delete", uint64(10000)).Return(nil)
+				client.On("Del", "SlC").Return(nil)
+			},
+			nil,
+		},
+		{
+			"when URL not found",
+			"ABC",
+			func() {
+				repo.On("Delete", uint64(7750)).Return(errors.New("URL not found."))
+			},
+			errors.New("URL not found."),
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			test.runMock()
+
+			err := usecase.Delete(test.input)
+			assert.Equal(t, test.expected, err)
 		})
 	}
 }
