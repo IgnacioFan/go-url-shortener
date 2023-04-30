@@ -7,13 +7,15 @@ import (
 	"gorm.io/gorm"
 )
 
-var v20220312 = &gormigrate.Migration{
-	ID: "20220312",
+var v20230312 = &gormigrate.Migration{
+	ID: "20230312",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&entity.ShortUrl{}); err != nil {
-			return err
+		// when table already exists, it just adds fields as columns
+		type ShortUrl struct {
+			gorm.Model
+			Url string `gorm:"type:varchar(1024) not null"`
 		}
-		return nil
+		return tx.AutoMigrate(&ShortUrl{})
 	},
 	Rollback: func(tx *gorm.DB) error {
 		if err := tx.Migrator().DropTable(&entity.ShortUrl{}); err != nil {
