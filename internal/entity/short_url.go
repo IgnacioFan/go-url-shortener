@@ -1,13 +1,18 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type ShortUrl struct {
-	ID         uint64
-	Url        string `gorm:"type:varchar(1024) not null"`
-	Expired_At time.Time
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	ID        uint64
+	Url       string `gorm:"type:varchar(1024) not null"`
+	ExpiredAt time.Time
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 }
 
 func (s *ShortUrl) TableName() string {
@@ -18,7 +23,7 @@ type ShortUrlRepository interface {
 	Create(url string) (uint64, error)
 	FindBy(url string) (uint64, error)
 	Find(id uint64) (string, error)
-	Delete(id uint64) error
+	Delete(id uint64) (uint64, error)
 }
 
 type ShortUrlUsecase interface {

@@ -139,7 +139,7 @@ func TestShortUrlDelete(t *testing.T) {
 			"when successs",
 			"SlC",
 			func() {
-				repo.On("Delete", uint64(10000)).Return(nil)
+				repo.On("Delete", uint64(10000)).Return(uint64(1), nil)
 				client.On("Del", "SlC").Return(nil)
 			},
 			nil,
@@ -148,7 +148,7 @@ func TestShortUrlDelete(t *testing.T) {
 			"when URL not found",
 			"ABC",
 			func() {
-				repo.On("Delete", uint64(7750)).Return(errors.New("URL not found."))
+				repo.On("Delete", uint64(7750)).Return(uint64(0), errors.New("URL not found."))
 			},
 			errors.New("URL not found."),
 		},

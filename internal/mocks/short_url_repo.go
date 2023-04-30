@@ -31,17 +31,24 @@ func (_m *ShortUrlRepository) Create(url string) (uint64, error) {
 }
 
 // Delete provides a mock function with given fields: id
-func (_m *ShortUrlRepository) Delete(id uint64) error {
+func (_m *ShortUrlRepository) Delete(id uint64) (uint64, error) {
 	ret := _m.Called(id)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(uint64) error); ok {
+	var r0 uint64
+	if rf, ok := ret.Get(0).(func(uint64) uint64); ok {
 		r0 = rf(id)
 	} else {
-		r0 = ret.Error(0)
+		r0 = ret.Get(0).(uint64)
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(uint64) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // Find provides a mock function with given fields: id

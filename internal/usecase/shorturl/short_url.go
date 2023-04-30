@@ -5,7 +5,6 @@ import (
 	"go-url-shortener/internal/entity"
 	"go-url-shortener/internal/usecase/base62"
 	"go-url-shortener/pkg/redis"
-	"log"
 )
 
 type ShortUrl struct {
@@ -53,11 +52,14 @@ func (i *ShortUrl) Delete(code string) error {
 	if err != nil {
 		return err
 	}
-	if err = i.Repo.Delete(id); err != nil {
+	res, err := i.Repo.Delete(id)
+	if res == 1 && err == nil {
+		// print out if failure
+		_ = i.Client.Del(code)
+		return nil
+	} else if res == 0 && err == nil {
+		return errors.New("URL not found.")
+	} else {
 		return err
 	}
-	if err = i.Client.Del(code); err != nil {
-		return err
-	}
-	return nil
 }

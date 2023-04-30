@@ -45,10 +45,10 @@ func TestShortUrlCreate(t *testing.T) {
 			"Return URL ID",
 			"https://example.com/foobar",
 			func() {
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "urls"`)).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "short_urls"`)).
 					WillReturnError(gorm.ErrRecordNotFound)
 				mock.ExpectBegin()
-				mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "urls"`)).
+				mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "short_urls"`)).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 				mock.ExpectCommit()
 			},
@@ -87,7 +87,7 @@ func TestShortUrlFindBy(t *testing.T) {
 			"Return URL ID",
 			"https://example.com/foobar",
 			func() {
-				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "urls"`)).
+				mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "short_urls"`)).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 			},
 			struct {
@@ -116,25 +116,32 @@ func TestShortUrlDelet(t *testing.T) {
 		name     string
 		input    uint64
 		runSQL   func()
-		expected error
+		expected struct {
+			Row uint64
+			Err error
+		}
 	}{
 		{
 			"when delete successfully",
 			1,
 			func() {
 				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "urls"`)).WithArgs(1).WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectExec(regexp.QuoteMeta(`UPDATE "short_urls" SET`)).WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 			},
-			nil,
+			struct {
+				Row uint64
+				Err error
+			}{1, nil},
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			test.runSQL()
 
-			err := repository.Delete(test.input)
-			assert.Equal(t, test.expected, err)
+			row, err := repository.Delete(test.input)
+			assert.Equal(t, test.expected.Row, row)
+			assert.Equal(t, test.expected.Err, err)
 		})
 	}
 }

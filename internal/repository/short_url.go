@@ -4,7 +4,6 @@ import (
 	"errors"
 	"go-url-shortener/internal/entity"
 	"go-url-shortener/pkg/postgres"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -27,7 +26,7 @@ func (i *ShortUrl) Create(url string) (uint64, error) {
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return 0, err
 	}
-	res := &entity.ShortUrl{Url: url, CreatedAt: time.Now(), UpdatedAt: time.Now()}
+	res := &entity.ShortUrl{Url: url}
 	if err := i.DB.Create(res).Error; err != nil {
 		return 0, err
 	}
@@ -50,10 +49,7 @@ func (i *ShortUrl) Find(id uint64) (string, error) {
 	return res.Url, nil
 }
 
-func (i *ShortUrl) Delete(id uint64) error {
-	// res := &entity.ShortUrl{}
-	if err := i.DB.Delete(&entity.ShortUrl{}, id).Error; err != nil {
-		return err
-	}
-	return nil
+func (i *ShortUrl) Delete(id uint64) (uint64, error) {
+	res := i.DB.Where("id = ?", id).Delete(&entity.ShortUrl{})
+	return uint64(res.RowsAffected), res.Error
 }
