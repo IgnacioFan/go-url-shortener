@@ -12,25 +12,46 @@ services:
       - 5432:5432
     volumes:
       - go-url-db:/var/lib/postgresql/data
+    networks:
+      - go-short-url.network
 
   app:
     build:
       context: .
       dockerfile: build/Dockerfile
-    container_name: go-url-shortener
     restart: always
     ports:
-      - 3000:3000
+      - 3000
     depends_on:
       - db
       - redis
+    networks:
+      - go-short-url.network
+    deploy:
+      replicas: 3
     command: sh -c "/app/scripts/wait-for-it.sh go-url-db:5432 -t 60 -- ./app migrate && ./app server"
 
   redis:
-    container_name: go-url-cache
+    container_name: go-url-redis
     image: redis
     ports:
       - 6379:6379
+    networks:
+      - go-short-url.network
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./deployment/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    networks:
+      - go-short-url.network
 
 volumes:
   go-url-db:
+
+networks:
+  go-short-url.network:
