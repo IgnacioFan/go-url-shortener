@@ -1,16 +1,12 @@
 # Go URL Shortener
-A URL shortener creates shorter aliases for long and complex URLs. Users can paste a link and receive a shortened code or paste the code to be redirected to the original page. The system is designed to support high availability and scalability to handle high volumes of requests.
+The Go URL shortener allows users to create unique shortened code aliases for long and complex URLs. The project was built using the following technologies:
 
-## Technologies Used
-- `Gin` as the web framework
-- `Gorm` as the ORM framework
-- `Cobra` as the command-line interface framework
-- `PostgreSQL` for storing relational data
-- `Redis` for building the cache layer
-- `Mockery` and `sqlMock` for unit test
-- `Docker` for building containerized services and env
-- `Wire` for supporting components using dependency injection
-- `Github actions` for CI
+- Gin: used to handle HTTP requests and responses.
+- Gorm: used to simplify interactions with the PostgreSQL database.
+- PostgreSQL: used to store and retrieve data for the application.
+- Redis: used to cache frequently accessed data for improved performance.
+- Docker: used to package the application and its dependencies into containers for easy deployment and scalability.
+- Nginx: used to distribute incoming requests to multiple instances and rate limit.
 
 ## Installation and Setup
 
@@ -20,8 +16,8 @@ A URL shortener creates shorter aliases for long and complex URLs. Users can pas
 
 ### Run it via Docker compose
 
-1. Clone this repository to local
-2. Navigate to the repo
+1. Clone the repository to your local machine.
+2. Ensure that Docker is installed and running on your machine.
 
 ```
 // start all services
@@ -30,11 +26,12 @@ docker compose up
 // stop all services
 docker compose down
 ```
+3. Access the application at http://localhost
 
 ## Usage
 
 ### API: Shorten a URL
-- Send a POST request to `http://localhost:3000/api/shorten` with a JSON body containing a long URL you want to shorten. For example:
+- Send a POST request to `http://localhost/api/v1/urls` with a JSON body containing a long URL you want to shorten. For example:
 
 ```json
 {
@@ -55,7 +52,16 @@ docker compose down
 ```
 
 ### API: Redirect to the original URL
--  send a GET request to `http://localhost:3000/{shortcode}`, For example, `http://localhost:8080/abc` will redirect to `www.example.com/foo/bar?user=123`.
+-  send a GET request to `http://localhost/{shortcode}`, For example, `http://localhost/abc` will redirect to `www.example.com/foo/bar?user=123`.
+
+### API: Delete the shortened URL
+-  send a DELETE request to `http://localhost/api/v1/urls/{shortcode}`.
+
+### System architecture
+The system architecture was designed for high availability, to ensure the system remains operational even if one or more components fail.
+<p align="center">
+<img src="./images/url-shortener.png" width="600"/>
+</p>
 
 ## Test
 
