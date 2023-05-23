@@ -19,7 +19,6 @@ RUN apk --no-cache add ca-certificates bash
 WORKDIR /app
 
 COPY --from=build /app/app .
-COPY /deployment/config/ /app/deployment/config/
 COPY /deployment/nginx /app/deployment/nginx/
 
 EXPOSE 3000
