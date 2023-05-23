@@ -3,17 +3,20 @@ version: "3.8"
 services:
   db:
     image: postgres:alpine
-    container_name: go-url-db
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=short_url
+    container_name: ${POSTGRES_HOST}
+    env_file:
+      - .env
     ports:
       - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -h ${POSTGRES_HOST} -p 5432"]
+      interval: 10s
+      timeout: 5s
+      retries: 2
     volumes:
-      - go-url-db:/var/lib/postgresql/data
+      - go-url-shortener-db:/var/lib/postgresql/data
     networks:
-      - go-short-url.network
+      - go-url-shortener.network
 
   app:
     build:
@@ -23,21 +26,23 @@ services:
     ports:
       - 3000
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
     networks:
-      - go-short-url.network
+      - go-url-shortener.network
     deploy:
       replicas: 3
-    command: sh -c "/app/scripts/wait-for-it.sh go-url-db:5432 -t 60 -- ./app migrate && ./app server"
+    command: "./app server"
 
   redis:
-    container_name: go-url-redis
     image: redis
+    container_name: ${REDIS_HOST}
+    env_file:
+      - .env
     ports:
-      - 6379:6379
+      - ${EXPOSE_REDIS_PORT}:6379
     networks:
-      - go-short-url.network
+      - go-url-shortener.network
 
   nginx:
     image: nginx:latest
@@ -48,10 +53,10 @@ services:
     depends_on:
       - app
     networks:
-      - go-short-url.network
+      - go-url-shortener.network
 
 volumes:
-  go-url-db:
+  go-url-shortener-db:
 
 networks:
-  go-short-url.network:
+  go-url-shortener.network:
