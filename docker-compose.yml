@@ -7,9 +7,9 @@ services:
     env_file:
       - .env
     ports:
-      - 5432:5432
+      - ${POSTGRES_PORT}:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -h ${POSTGRES_HOST} -p 5432"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -h ${POSTGRES_HOST} -p ${POSTGRES_PORT}"]
       interval: 10s
       timeout: 5s
       retries: 2
@@ -23,6 +23,8 @@ services:
       context: .
       dockerfile: build/Dockerfile
     restart: always
+    env_file:
+      - .env
     ports:
       - 3000
     depends_on:
@@ -31,7 +33,7 @@ services:
     networks:
       - go-url-shortener.network
     deploy:
-      replicas: 3
+      replicas: 2
     command: "./app server"
 
   redis:
@@ -40,7 +42,7 @@ services:
     env_file:
       - .env
     ports:
-      - ${EXPOSE_REDIS_PORT}:6379
+      - ${REDIS_PORT}:6379
     networks:
       - go-url-shortener.network
 

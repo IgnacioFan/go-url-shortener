@@ -6,8 +6,8 @@ import (
 	"github.com/go-gormigrate/gormigrate/v2"
 )
 
-func (db *Postgres) NewMigrate() error {
-	if err := gormigrate.New(db.DB, gormigrate.DefaultOptions, migration.Migrations).Migrate(); err != nil {
+func (p *Postgres) NewMigrate() error {
+	if err := gormigrate.New(p.DB, gormigrate.DefaultOptions, migration.Migrations).Migrate(); err != nil {
 		return err
 	}
 	return nil

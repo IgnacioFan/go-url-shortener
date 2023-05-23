@@ -11,9 +11,7 @@ var (
 	userLicense string
 	cfgFile     string
 	rootCmd     = &cobra.Command{
-		Use:   "surl",
-		Short: "A URL Shortener",
-		Long:  "A high available and scalable URL shortener",
+		Short: "URL Shortener",
 	}
 )
 
@@ -26,13 +24,4 @@ func Execute() {
 }
 
 func init() {
-	// persistent flags will be global
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file")
-	// rootCmd.PersistentFlags().StringP("author", "a", "Weilong Fan", "author name for copyright attribution")
-	// rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
-	// rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
-
-	// local flags will only run when the action is called
-	rootCmd.AddCommand(ServerCmd)
-	rootCmd.AddCommand(MigrateCmd)
 }

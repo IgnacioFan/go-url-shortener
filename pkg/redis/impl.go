@@ -3,7 +3,7 @@ package redis
 import (
 	"errors"
 	"fmt"
-	"go-url-shortener/config"
+	"go-url-shortener/deployment/env"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -13,19 +13,14 @@ type Impl struct {
 	Client *redis.Client
 }
 
-func InitClient(config *config.Config) RedisClient {
-	client := redis.NewClient(&redis.Options{
-		Addr: fmt.Sprintf("%s:%d", config.Redis.Host, config.Redis.Port),
-	})
+func InitClient() (RedisClient, error) {
+	client := redis.NewClient(&redis.Options{Addr: env.RedisAddr()})
 	pong, err := client.Ping().Result()
 	if err != nil {
-		fmt.Println("redis error:", err)
+		return nil, err
 	}
 	fmt.Println(pong)
-
-	return &Impl{
-		Client: client,
-	}
+	return &Impl{Client: client}, nil
 }
 
 func (i *Impl) Get(key string) (string, error) {

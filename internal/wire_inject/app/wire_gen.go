@@ -7,7 +7,6 @@
 package app
 
 import (
-	"go-url-shortener/config"
 	"go-url-shortener/internal/delivery/handler"
 	"go-url-shortener/internal/repository"
 	"go-url-shortener/internal/usecase/shorturl"
@@ -18,15 +17,17 @@ import (
 // Injectors from wire.go:
 
 func Initialize() (Application, error) {
-	configConfig, err := config.New()
+	postgresPostgres, err := postgres.NewPostgres()
 	if err != nil {
 		return Application{}, err
 	}
-	postgresPostgres := postgres.InitPostgres(configConfig)
 	shortUrlRepository := repository.NewShortUrlRepo(postgresPostgres)
-	redisClient := redis.InitClient(configConfig)
+	redisClient, err := redis.InitClient()
+	if err != nil {
+		return Application{}, err
+	}
 	shortUrlUsecase := shorturl.NewShortUrlUsecase(shortUrlRepository, redisClient)
 	shortUrlHandler := handler.NewShortUrlHandler(shortUrlUsecase)
-	application := NewApplication(shortUrlHandler, configConfig)
+	application := NewApplication(shortUrlHandler)
 	return application, nil
 }
