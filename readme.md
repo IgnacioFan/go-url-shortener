@@ -37,4 +37,3 @@ TBD
 - https://github.com/JamesYu608/piccollage-problem2-shorten-url
 - https://github.com/davidwu1997/ShortURL
 - https://www.youtube.com/watch?v=JQDHz72OA3c
-- https://github.com/vishnubob/wait-for-it (for script)
