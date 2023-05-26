@@ -1,20 +1,64 @@
 version: "3.8"
 
 services:
-  db:
-    image: postgres:alpine
-    container_name: ${POSTGRES_HOST}
-    env_file:
-      - .env
+  # db:
+  #   image: postgres:alpine
+  #   container_name: ${POSTGRES_HOST}
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - ${POSTGRES_PORT}:5432
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -h ${POSTGRES_HOST} -p ${POSTGRES_PORT}"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 2
+  #   volumes:
+  #     - go-url-shortener-db:/var/lib/postgresql/data
+  #   networks:
+  #     - go-url-shortener.network
+
+  master:
+    image: bitnami/postgresql:11
+    container_name: master
     ports:
       - ${POSTGRES_PORT}:5432
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=replication_user
+      - POSTGRESQL_REPLICATION_PASSWORD=replication_password
+      - POSTGRESQL_USERNAME=database_user
+      - POSTGRESQL_PASSWORD=database_password
+      - POSTGRESQL_DATABASE=${POSTGRES_DB}
+      # Only the superuser "postgres" can execute "CREATE EXTENSION IF NOT EXISTS "pgcrypto";" if needed for having UUIDs
+      # Superuser needs a password set here
+      - POSTGRESQL_POSTGRES_PASSWORD=${POSTGRES_USER}
+      # To see direct actions on the database while examining read and write behavior:
+      # - POSTGRESQL_PGAUDIT_LOG=READ,WRITE
+      # - POSTGRESQL_SYNCHRONOUS_COMMIT_MODE=remote_apply # Safest method for data consistency
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -h ${POSTGRES_HOST} -p ${POSTGRES_PORT}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -h master -p ${POSTGRES_PORT}"]
       interval: 10s
       timeout: 5s
-      retries: 2
-    volumes:
-      - go-url-shortener-db:/var/lib/postgresql/data
+      retries: 4
+    networks:
+      - go-url-shortener.network
+
+  slave:
+    image: bitnami/postgresql:11
+    ports:
+      - 5432
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=replication_user
+      - POSTGRESQL_REPLICATION_PASSWORD=replication_password
+      - POSTGRESQL_MASTER_HOST=master
+      - POSTGRESQL_PASSWORD=database_password
+      - POSTGRESQL_MASTER_PORT_NUMBER=${POSTGRES_PORT}
+    deploy:
+      replicas: 2
+    depends_on:
+      - master
     networks:
       - go-url-shortener.network
 
@@ -28,7 +72,7 @@ services:
     ports:
       - 3000
     depends_on:
-      db:
+      master:
         condition: service_healthy
     networks:
       - go-url-shortener.network
@@ -56,9 +100,6 @@ services:
       - app
     networks:
       - go-url-shortener.network
-
-volumes:
-  go-url-shortener-db:
 
 networks:
   go-url-shortener.network:
