@@ -8,37 +8,46 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/go-playground/assert/v2"
 	"github.com/joho/godotenv"
+	"github.com/stretchr/testify/suite"
 )
 
 func init() {
 	godotenv.Load()
 }
 
-func Test_get_health(t *testing.T) {
+type ServiceTestSuite struct {
+	suite.Suite
+	TestServer *httptest.Server
+}
+
+func TestServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(ServiceTestSuite))
+}
+
+func (suite *ServiceTestSuite) SetupSuite() {
 	db, err := postgres.NewPostgres()
-	if err != nil {
-		t.Fatalf("Test DB connection error: %s", err)
-	}
+	suite.Require().NoError(err)
+
 	if err = db.NewMigrate(); err != nil {
-		t.Fatalf("Test DB migration error: %s", err)
+		suite.Require().NoError(err)
 	}
+
 	app, err := app.Initialize()
-	if err != nil {
-		t.Fatalf("App initialization error: %s", err)
-	}
-	ts := httptest.NewServer(
+	suite.Require().NoError(err)
+
+	suite.TestServer = httptest.NewServer(
 		app.HttpServer.Engine,
 	)
+}
 
-	t.Run("returns ok when is heathy", func(t *testing.T) {
-		resp, err := http.Get(fmt.Sprintf("%s/health", ts.URL))
+func (suite *ServiceTestSuite) SetupTest() {
+	// TBD
+}
 
-		if err != nil {
-			t.Fatalf("Expected no error, got %v", err)
-		}
+func (suite *ServiceTestSuite) TestGetHeath() {
+	resp, err := http.Get(fmt.Sprintf("%s/health", suite.TestServer.URL))
 
-		assert.Equal(t, 200, resp.StatusCode)
-	})
+	suite.Require().NoError(err)
+	suite.Require().Equal(http.StatusOK, resp.StatusCode)
 }
