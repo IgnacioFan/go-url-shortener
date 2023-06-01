@@ -7,3 +7,9 @@ services:
       - /test/integration/.env
     ports:
       - ${POSTGRES_PORT}:5432
+  redis:
+    image: redis:7.0.11-alpine
+    env_file:
+      - /test/integration/.env
+    ports:
+      - ${REDIS_PORT}:6379
