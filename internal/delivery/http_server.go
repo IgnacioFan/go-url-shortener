@@ -24,7 +24,9 @@ func NewHttpServer(shortUrl *handler.ShortUrlHandler) *HttpServer {
 
 func (s *HttpServer) SetRouter() {
 	s.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, "heathy")
+		ctx.JSON(http.StatusOK, &handler.Response{
+			Message: "heathy",
+		})
 	})
 
 	v1 := s.Group("api/v1")

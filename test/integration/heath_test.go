@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-url-shortener/internal/wire_inject/app"
 	"go-url-shortener/pkg/postgres"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,38 +17,42 @@ func init() {
 	godotenv.Load()
 }
 
-type ServiceTestSuite struct {
+type TestSuite struct {
 	suite.Suite
 	TestServer *httptest.Server
+	TestDB     *postgres.Postgres
 }
 
-func TestServiceTestSuite(t *testing.T) {
-	suite.Run(t, new(ServiceTestSuite))
+func TestTestSuite(t *testing.T) {
+	suite.Run(t, new(TestSuite))
 }
 
-func (suite *ServiceTestSuite) SetupSuite() {
+func (s *TestSuite) SetupSuite() {
 	db, err := postgres.NewPostgres()
-	suite.Require().NoError(err)
+	s.Require().NoError(err)
 
 	if err = db.NewMigrate(); err != nil {
-		suite.Require().NoError(err)
+		s.Require().NoError(err)
 	}
 
 	app, err := app.Initialize()
-	suite.Require().NoError(err)
+	s.Require().NoError(err)
 
-	suite.TestServer = httptest.NewServer(
-		app.HttpServer.Engine,
-	)
+	s.TestDB = db
+	s.TestServer = httptest.NewServer(app.HttpServer.Engine)
 }
 
-func (suite *ServiceTestSuite) SetupTest() {
+func (s *TestSuite) SetupTest() {
 	// TBD
 }
 
-func (suite *ServiceTestSuite) TestGetHeath() {
-	resp, err := http.Get(fmt.Sprintf("%s/health", suite.TestServer.URL))
+func (s *TestSuite) TestGetHeath() {
+	res, err := http.Get(fmt.Sprintf("%s/health", s.TestServer.URL))
+	s.Require().NoError(err)
+	body, err := ioutil.ReadAll(res.Body)
+	s.Require().NoError(err)
+	defer res.Body.Close()
 
-	suite.Require().NoError(err)
-	suite.Require().Equal(http.StatusOK, resp.StatusCode)
+	s.Require().Equal(http.StatusOK, res.StatusCode)
+	s.Require().Equal(`{"message":"heathy","data":null}`, string(body))
 }
