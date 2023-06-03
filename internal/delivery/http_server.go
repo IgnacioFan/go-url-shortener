@@ -25,7 +25,7 @@ func NewHttpServer(shortUrl *handler.ShortUrlHandler) *HttpServer {
 func (s *HttpServer) SetRouter() {
 	s.GET("/health", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, &handler.Response{
-			Message: "heathy",
+			Message: "healthy",
 		})
 	})
 
