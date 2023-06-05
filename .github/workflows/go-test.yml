@@ -13,7 +13,7 @@ jobs:
       with:
         go-version: 1.19
     - name: Run Tests with Coverage
-      run: go test -v -coverprofile=coverage.txt -cover ./internal/...
+      run: go test -v -coverprofile=coverage.txt -cover ./test/...
     - name: Upload Coverage Artifact
       uses: actions/upload-artifact@v2
       with:
