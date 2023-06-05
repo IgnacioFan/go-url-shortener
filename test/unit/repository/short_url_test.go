@@ -1,15 +1,15 @@
-package repository
+package test
 
 import (
 	"database/sql"
+	repo "go-url-shortener/internal/repository"
+	pkg "go-url-shortener/pkg/postgres"
 	"regexp"
 	"testing"
 
-	pkg "go-url-shortener/pkg/postgres"
-
+	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/postgres"
 
-	"github.com/go-playground/assert/v2"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"gorm.io/gorm"
 )
@@ -30,7 +30,7 @@ func MockDB(t *testing.T) (*sql.DB, *pkg.Postgres, sqlmock.Sqlmock) {
 func TestShortUrlCreate(t *testing.T) {
 	db, conn, mock := MockDB(t)
 	defer db.Close()
-	repository := NewShortUrlRepo(conn)
+	repository := repo.NewShortUrlRepo(conn)
 
 	tests := []struct {
 		name     string
@@ -72,7 +72,7 @@ func TestShortUrlCreate(t *testing.T) {
 func TestShortUrlFindBy(t *testing.T) {
 	db, conn, mock := MockDB(t)
 	defer db.Close()
-	repository := NewShortUrlRepo(conn)
+	repository := repo.NewShortUrlRepo(conn)
 
 	tests := []struct {
 		name     string
@@ -110,7 +110,7 @@ func TestShortUrlFindBy(t *testing.T) {
 func TestShortUrlDelet(t *testing.T) {
 	db, conn, mock := MockDB(t)
 	defer db.Close()
-	repository := NewShortUrlRepo(conn)
+	repository := repo.NewShortUrlRepo(conn)
 
 	tests := []struct {
 		name     string

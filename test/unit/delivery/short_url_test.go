@@ -1,22 +1,23 @@
-package handler
+package test
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"go-url-shortener/internal/mocks"
+	h "go-url-shortener/internal/delivery/handler"
+	"go-url-shortener/test/mocks"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/assert/v2"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
 	shortUrlMock = new(mocks.ShortUrlUsecase)
-	handler      = NewShortUrlHandler(shortUrlMock)
+	handler      = h.NewShortUrlHandler(shortUrlMock)
 )
 
 type Expected struct {

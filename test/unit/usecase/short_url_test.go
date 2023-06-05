@@ -1,11 +1,12 @@
-package shorturl
+package test
 
 import (
 	"errors"
-	"go-url-shortener/internal/mocks"
+	"go-url-shortener/internal/usecase/shorturl"
+	"go-url-shortener/test/mocks"
 	"testing"
 
-	"github.com/go-playground/assert/v2"
+	"github.com/stretchr/testify/assert"
 )
 
 type Expected struct {
@@ -15,7 +16,7 @@ type Expected struct {
 
 func TestShortUrlCreate(t *testing.T) {
 	repo, client := new(mocks.ShortUrlRepository), new(mocks.RedisClient)
-	usecase := NewShortUrlUsecase(repo, client)
+	usecase := shorturl.NewShortUrlUsecase(repo, client)
 
 	tests := []struct {
 		name     string
@@ -48,7 +49,7 @@ func TestShortUrlCreate(t *testing.T) {
 
 func TestShortUrlRedirect(t *testing.T) {
 	repo, client := new(mocks.ShortUrlRepository), new(mocks.RedisClient)
-	usecase := NewShortUrlUsecase(repo, client)
+	usecase := shorturl.NewShortUrlUsecase(repo, client)
 
 	tests := []struct {
 		name     string
@@ -127,7 +128,7 @@ func TestShortUrlRedirect(t *testing.T) {
 
 func TestShortUrlDelete(t *testing.T) {
 	repo, client := new(mocks.ShortUrlRepository), new(mocks.RedisClient)
-	usecase := NewShortUrlUsecase(repo, client)
+	usecase := shorturl.NewShortUrlUsecase(repo, client)
 
 	tests := []struct {
 		name     string

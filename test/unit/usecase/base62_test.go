@@ -1,10 +1,11 @@
-package base62
+package test
 
 import (
 	"errors"
+	"go-url-shortener/internal/usecase/base62"
 	"testing"
 
-	"github.com/go-playground/assert/v2"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestBase62Encode(t *testing.T) {
@@ -21,7 +22,7 @@ func TestBase62Encode(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.expectedRes, Encode(test.input))
+			assert.Equal(t, test.expectedRes, base62.Encode(test.input))
 		})
 	}
 }
@@ -48,7 +49,7 @@ func TestBase62Decode(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			id, err := Decode(test.input)
+			id, err := base62.Decode(test.input)
 			if test.expectedErr != nil {
 				assert.Equal(t, test.expectedRes, id)
 				assert.Equal(t, test.expectedErr, err)
