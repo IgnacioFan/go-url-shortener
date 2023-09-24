@@ -1,7 +1,6 @@
-package delivery
+package http
 
 import (
-	"go-url-shortener/internal/delivery/handler"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,10 +8,10 @@ import (
 
 type HttpServer struct {
 	*gin.Engine
-	ShortUrl *handler.ShortUrlHandler
+	ShortUrl *ShortUrlHandler
 }
 
-func NewHttpServer(shortUrl *handler.ShortUrlHandler) *HttpServer {
+func NewHttpServer(shortUrl *ShortUrlHandler) *HttpServer {
 	server := &HttpServer{
 		Engine:   gin.Default(),
 		ShortUrl: shortUrl,
@@ -24,7 +23,7 @@ func NewHttpServer(shortUrl *handler.ShortUrlHandler) *HttpServer {
 
 func (s *HttpServer) SetRouter() {
 	s.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, &handler.Response{
+		ctx.JSON(http.StatusOK, &Response{
 			Message: "healthy",
 		})
 	})

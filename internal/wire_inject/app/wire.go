@@ -5,7 +5,7 @@
 package app
 
 import (
-	"go-url-shortener/internal/delivery/handler"
+	"go-url-shortener/internal/delivery/http"
 	"go-url-shortener/internal/repository"
 	"go-url-shortener/internal/usecase/shorturl"
 	"go-url-shortener/pkg/postgres"
@@ -17,7 +17,7 @@ import (
 func Initialize() (Application, error) {
 	wire.Build(
 		NewApplication,
-		handler.NewShortUrlHandler,
+		http.NewShortUrlHandler,
 		shorturl.NewShortUrlUsecase,
 		repository.NewShortUrlRepo,
 		postgres.NewPostgres,

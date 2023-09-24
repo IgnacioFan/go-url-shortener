@@ -2,16 +2,15 @@ package app
 
 import (
 	"fmt"
-	"go-url-shortener/internal/delivery"
-	"go-url-shortener/internal/delivery/handler"
+	"go-url-shortener/internal/delivery/http"
 )
 
 type Application struct {
-	HttpServer *delivery.HttpServer
+	HttpServer *http.HttpServer
 }
 
-func NewApplication(handler *handler.ShortUrlHandler) Application {
-	server := delivery.NewHttpServer(handler)
+func NewApplication(handler *http.ShortUrlHandler) Application {
+	server := http.NewHttpServer(handler)
 
 	return Application{
 		HttpServer: server,

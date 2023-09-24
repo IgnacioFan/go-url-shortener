@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	h "go-url-shortener/internal/delivery/handler"
+	h "go-url-shortener/internal/delivery/http"
 	"go-url-shortener/test/mocks"
 	"net/http"
 	"net/http/httptest"
