@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   db:
-    image: postgres:alpine
+    image: postgres:15.3-alpine
     container_name: ${POSTGRES_HOST}
     env_file:
       - .env
@@ -37,7 +37,7 @@ services:
     command: "./app server"
 
   redis:
-    image: redis
+    image: redis:7.0.11-alpine
     container_name: ${REDIS_HOST}
     env_file:
       - .env

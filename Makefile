@@ -13,5 +13,8 @@ app.stop:
 db.cli:
 	docker exec -it $(POSTGRES_HOST) psql -U $(POSTGRES_USER)
 
+test.prep:
+	docker-compose -f docker-compose.test.yml up --build -d
+
 gen.env:
 	./scripts/generate_env.sh

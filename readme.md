@@ -6,6 +6,7 @@
   - [Table of Contents](#table-of-contents)
   - [Prerequisite](#prerequisite)
   - [How to run](#how-to-run)
+    - [How to test?](#how-to-test)
   - [Design Concepts](#design-concepts)
     - [Requirements](#requirements)
     - [System Architecture](#system-architecture)
@@ -37,7 +38,12 @@
 
 6. Run `make app.stop` to clean up the containers
 
-End! To know more about other executable commands, please check out the Makefile.
+### How to test?
+1. xx
+2. Run `xxx`
+
+
+To know more about other executable commands, please check out the Makefile.
 
 ## Design Concepts
 The Go URL shortener allows users to create unique shortened URLs that redirect to the original URLs.
@@ -83,7 +89,7 @@ ShortUrl
 Developers often underestimate the importance of security in software. I have taken several security approaches to prevent well-known attacks such as SQL injection, and CSRF, while designing the system.
 
 The security approaches are
-- Inputs validation
+- Inputs validation uisng `govalidator`
 - xx headers
 
 ### Testing
