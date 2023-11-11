@@ -1,4 +1,4 @@
-package grpccontroller
+package controller
 
 import (
 	"context"
@@ -7,26 +7,29 @@ import (
 	"net"
 
 	urlshortnerPB "go-url-shortener/url_shortner_service/proto"
+	"go-url-shortener/url_shortner_service/service"
 
 	"google.golang.org/grpc"
 )
 
-type Server struct{}
-
-func (*Server) GetShortUrl(ctx context.Context, req *urlshortnerPB.ShrotUrlRequest) (*urlshortnerPB.ShortUrlResponse, error) {
-	fmt.Printf("Sum function is invoked with %v \n", req)
-
-	url := req.GetLongUrl()
-	fmt.Println(url)
-
-	res := &urlshortnerPB.ShortUrlResponse{
-		ShortUrl: "",
-	}
-
-	return res, nil
+type UrlShortenerHandler struct {
+	Service service.UrlShortenService
 }
 
-func (*Server) GetLongUrl(ctx context.Context, req *urlshortnerPB.LongUrlRequest) (*urlshortnerPB.LongUrlResponse, error) {
+func (h *UrlShortenerHandler) GetShortUrl(ctx context.Context, req *urlshortnerPB.ShrotUrlRequest) (*urlshortnerPB.ShortUrlResponse, error) {
+	fmt.Printf("GetShortUrl function is invoked with %v \n", req)
+
+	url := req.GetLongUrl()
+	res, err := h.Service.CreateShortUrl(url)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return &urlshortnerPB.ShortUrlResponse{
+		ShortUrl: res,
+	}, nil
+}
+
+func (h *UrlShortenerHandler) GetLongUrl(ctx context.Context, req *urlshortnerPB.LongUrlRequest) (*urlshortnerPB.LongUrlResponse, error) {
 	fmt.Printf("Sum function is invoked with %v \n", req)
 
 	shortUrl := req.GetShortUrl()
@@ -48,7 +51,12 @@ func NewServer() {
 	}
 
 	grpcServer := grpc.NewServer()
-	urlshortnerPB.RegisterUrlShortnerServiceServer(grpcServer, &Server{})
+	urlshortnerPB.RegisterUrlShortnerServiceServer(
+		grpcServer,
+		&UrlShortenerHandler{
+			Service: *service.NewUrlShortenService(),
+		},
+	)
 
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v \n", err)
