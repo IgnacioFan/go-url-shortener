@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-url-shortener/internal/wire_inject/app"
 	"go-url-shortener/pkg/postgres"
+	grpccontroller "go-url-shortener/url_shortner_service/controller"
 	"log"
 	"os"
 
@@ -11,7 +12,14 @@ import (
 )
 
 var (
-	port      int
+	port        int
+	shortUrlCmd = &cobra.Command{
+		Use:   "surl",
+		Short: "run URL shortener service",
+		Run: func(cmd *cobra.Command, args []string) {
+			grpccontroller.NewServer()
+		},
+	}
 	serverCmd = &cobra.Command{
 		Use:   "server",
 		Short: "run HTTP server",
@@ -38,6 +46,7 @@ var (
 )
 
 func init() {
-	rootCmd.AddCommand(serverCmd)
+	rootCmd.AddCommand(shortUrlCmd, serverCmd)
+	shortUrlCmd.PersistentFlags().IntVarP(&port, "port", "p", 50051, "expose port number")
 	serverCmd.PersistentFlags().IntVarP(&port, "port", "p", 3000, "expose port number")
 }
