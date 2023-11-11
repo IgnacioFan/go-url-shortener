@@ -1,0 +1,25 @@
+syntax = "proto3";  
+
+package urlshortner;  
+option go_package = "./;UrlShortner"; 
+
+service UrlShortnerService {
+  rpc GetShortUrl(ShrotUrlRequest) returns (ShortUrlResponse) {}
+  rpc GetLongUrl(LongUrlRequest) returns (LongUrlResponse) {}
+}
+
+message ShrotUrlRequest {
+  string longUrl = 1;
+}
+
+message ShortUrlResponse {
+  string shortUrl = 1;
+}
+
+message LongUrlRequest {
+  string shortUrl = 1;
+}
+
+message LongUrlResponse {
+  string longUrl = 1;
+}
