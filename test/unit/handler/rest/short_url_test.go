@@ -1,9 +1,9 @@
-package handler_test
+package rest_test
 
 import (
 	"bytes"
 	"encoding/json"
-	"go-url-shortener/internal/handler"
+	"go-url-shortener/internal/app/rest"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +11,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+)
+
+var (
+	// service 
+	handler = rest.InitShortUrl()
 )
 
 type Expected struct {

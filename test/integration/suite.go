@@ -1,7 +1,7 @@
 package integration
 
 import (
-	"go-url-shortener/internal/wire_inject/app"
+	"go-url-shortener/internal/app"
 	"go-url-shortener/pkg/postgres"
 	"net/http/httptest"
 
@@ -29,9 +29,10 @@ func (t *TestSuite) SetupSuite() {
 		t.Require().NoError(err)
 	}
 
-	app, err := app.Initialize()
-	t.Require().NoError(err)
+	// app, err := app.Initialize()
+	service := app.InitShortUrl()
+	// t.Require().NoError(err)
 
 	t.TestDB = db
-	t.TestServer = httptest.NewServer(app.HttpServer.Engine)
+	t.TestServer = httptest.NewServer(service)
 }

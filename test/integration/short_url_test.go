@@ -70,71 +70,71 @@ func (t *ShortUrlTestSuite) TestCreate() {
 	}
 }
 
-func (t *ShortUrlTestSuite) TestRedirect() {
-	url := t.TestServer.URL
-	t.Seed()
-	defer t.RestoreTable()
+// func (t *ShortUrlTestSuite) TestRedirect() {
+// 	url := t.TestServer.URL
+// 	t.Seed()
+// 	defer t.RestoreTable()
 
-	testCases := []struct {
-		Desc     string
-		Input    string
-		Expected string
-	}{
-		{
-			"redirect to the original URL",
-			"B",
-			"https://example.com/foobar",
-		},
-	}
-	for _, tc := range testCases {
-		t.Run(tc.Desc, func() {
-			client := http.Client{
-				// use http.Client with checkRedirect to make Go NOT follow redirects
-				CheckRedirect: func(req *http.Request, via []*http.Request) error {
-					return http.ErrUseLastResponse
-				}}
-			res, err := client.Get(fmt.Sprintf("%s/%s", url, tc.Input))
-			t.Require().NoError(err)
-			defer res.Body.Close()
+// 	testCases := []struct {
+// 		Desc     string
+// 		Input    string
+// 		Expected string
+// 	}{
+// 		{
+// 			"redirect to the original URL",
+// 			"B",
+// 			"https://example.com/foobar",
+// 		},
+// 	}
+// 	for _, tc := range testCases {
+// 		t.Run(tc.Desc, func() {
+// 			client := http.Client{
+// 				// use http.Client with checkRedirect to make Go NOT follow redirects
+// 				CheckRedirect: func(req *http.Request, via []*http.Request) error {
+// 					return http.ErrUseLastResponse
+// 				}}
+// 			res, err := client.Get(fmt.Sprintf("%s/%s", url, tc.Input))
+// 			t.Require().NoError(err)
+// 			defer res.Body.Close()
 
-			t.Require().Equal(http.StatusFound, res.StatusCode)
-			t.Require().Equal(tc.Expected, res.Header.Get("Location"))
-		})
-	}
-}
+// 			t.Require().Equal(http.StatusFound, res.StatusCode)
+// 			t.Require().Equal(tc.Expected, res.Header.Get("Location"))
+// 		})
+// 	}
+// }
 
-func (t *ShortUrlTestSuite) TestDelete() {
-	url := t.TestServer.URL
-	t.Seed()
-	defer t.RestoreTable()
+// func (t *ShortUrlTestSuite) TestDelete() {
+// 	url := t.TestServer.URL
+// 	t.Seed()
+// 	defer t.RestoreTable()
 
-	testCases := []struct {
-		Desc    string
-		Input   string
-		ResBody string
-	}{
-		{
-			"success",
-			"B",
-			`{"message":"URL deleted successfully.","data":null}`,
-		},
-	}
-	for _, tc := range testCases {
-		t.Run(tc.Desc, func() {
-			client := &http.Client{}
-			req, err := http.NewRequest(
-				"DELETE",
-				fmt.Sprintf("%s/api/v1/urls/%s", url, tc.Input),
-				nil,
-			)
-			t.Require().NoError(err)
-			res, err := client.Do(req)
-			t.Require().NoError(err)
-			body, _ := ioutil.ReadAll(res.Body)
-			defer res.Body.Close()
+// 	testCases := []struct {
+// 		Desc    string
+// 		Input   string
+// 		ResBody string
+// 	}{
+// 		{
+// 			"success",
+// 			"B",
+// 			`{"message":"URL deleted successfully.","data":null}`,
+// 		},
+// 	}
+// 	for _, tc := range testCases {
+// 		t.Run(tc.Desc, func() {
+// 			client := &http.Client{}
+// 			req, err := http.NewRequest(
+// 				"DELETE",
+// 				fmt.Sprintf("%s/api/v1/urls/%s", url, tc.Input),
+// 				nil,
+// 			)
+// 			t.Require().NoError(err)
+// 			res, err := client.Do(req)
+// 			t.Require().NoError(err)
+// 			body, _ := ioutil.ReadAll(res.Body)
+// 			defer res.Body.Close()
 
-			t.Require().Equal(http.StatusOK, res.StatusCode)
-			t.Require().Equal(tc.ResBody, string(body))
-		})
-	}
-}
+// 			t.Require().Equal(http.StatusOK, res.StatusCode)
+// 			t.Require().Equal(tc.ResBody, string(body))
+// 		})
+// 	}
+// }

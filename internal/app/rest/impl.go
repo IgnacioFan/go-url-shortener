@@ -1,4 +1,4 @@
-package handler
+package rest
 
 import (
 	"go-url-shortener/internal/service/url"
@@ -6,6 +6,14 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
+)
+
+const (
+	SHROT_URL_REGEX = "^[a-zA-Z0-9]{1,7}$"
+)
+
+var (
+	invalidParams = &ErrorResponse{Error: "invalid params"}
 )
 
 type Response struct {
@@ -21,15 +29,35 @@ type URLRequest struct {
 	LongUrl                 string `json:"long_url"`
 }
 
-const (
-	SHROT_URL_REGEX = "^[a-zA-Z0-9]{1,7}$"
-)
+type Impl struct {
+	*gin.Engine
+	Url url.UrlService
+}
 
-var (
-	invalidParams = &ErrorResponse{Error: "invalid params"}
-)
+func InitShortUrl(url url.UrlService) *Impl {
+	service := &Impl{
+		Engine:   gin.Default(),
+		Url: url, 
+	}
 
-func CreateURL(ctx *gin.Context) {
+	service.SetRouter()
+	return service
+}
+
+func (i *Impl) SetRouter() {
+	// s.GET("/health", func(ctx *gin.Context) {
+	// 	ctx.JSON(http.StatusOK, &handler.Response{
+	// 		Message: "healthy",
+	// 	})
+	// })
+	v1 := i.Group("v1")
+	{
+		v1.POST("/urls", i.CreateURL)
+		v1.GET("/urls/:name", i.RedirectURL)
+	}
+}
+
+func (i *Impl) CreateURL(ctx *gin.Context) {
 	req := &URLRequest{}
 	if err := ctx.BindJSON(req); err != nil {
 		ctx.JSON(http.StatusBadRequest, err.Error())
@@ -39,7 +67,7 @@ func CreateURL(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, invalidParams)
 		return
 	}
-	name, err := url.GenerateShortURL(req.LongUrl)
+	name, err := i.Url.GenerateShortURL(req.LongUrl)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &ErrorResponse{Error: err.Error()})
 		return
@@ -49,31 +77,16 @@ func CreateURL(ctx *gin.Context) {
 	})
 }
 
-func RedirectURL(ctx *gin.Context) {
+func (i *Impl) RedirectURL(ctx *gin.Context) {
 	shortUrl, ok := ctx.Params.Get("name")
 	if !ok || !govalidator.Matches(shortUrl, SHROT_URL_REGEX) {
 		ctx.JSON(http.StatusBadRequest, invalidParams)
 		return
 	}
-	originalUrl, err := url.OriginalURL(shortUrl)
+	originalUrl, err := i.Url.OriginalURL(shortUrl)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, &ErrorResponse{Error: err.Error()})
 		return
 	}
 	ctx.Redirect(http.StatusFound, originalUrl)
-}
-
-func DeleteURL(ctx *gin.Context)  {
-	shortUrl, ok := ctx.Params.Get("name")
-	if !ok || !govalidator.Matches(shortUrl, SHROT_URL_REGEX) {
-		ctx.JSON(http.StatusBadRequest, invalidParams)
-		return
-	}
-	// if err := h.ShortUrl.Delete(code); err != nil {
-	// 	ctx.JSON(http.StatusNotFound, &ErrorResponse{Error: err.Error()})
-	// 	return
-	// }
-	ctx.JSON(http.StatusOK, &Response{
-		Message: "deleted the URL",
-	})
 }
