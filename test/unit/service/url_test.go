@@ -1,4 +1,4 @@
-package test
+package service_test
 
 import (
 	"go-url-shortener/internal/service/url"
@@ -16,9 +16,10 @@ type Expected struct {
 
 func TestGenerateShortURL(t *testing.T) {
   ctrl := gomock.NewController(t)
-	zooKeeperMock := mocks.NewMockZookeeper(ctrl)
+  zooKeeperMock := mocks.NewMockZookeeper(ctrl)
+  urlRepoMock := mocks.NewMockUrlRepository(ctrl)
   zooKeeperMock.EXPECT().SetNewRange().Return(1,5,nil) 
-  service, _ := url.InitUrl(zooKeeperMock)
+  service, _ := url.InitUrl(zooKeeperMock, urlRepoMock)
 
   tests := []struct {
     Name     string
@@ -44,10 +45,48 @@ func TestGenerateShortURL(t *testing.T) {
       test.RunMock()
 
       for _, v := range test.Expected.Res.([]string) {
+        urlRepoMock.EXPECT().Create(test.Input, v).Return(nil)
+
         res, err := service.GenerateShortURL(test.Input)
         assert.Equal(t, v, res)
         assert.Equal(t, test.Expected.Err, err)
       }
+    })
+  }
+}
+
+func TestShortUrlRedirect(t *testing.T) {
+  ctrl := gomock.NewController(t)
+  zooKeeperMock := mocks.NewMockZookeeper(ctrl)
+  urlRepoMock := mocks.NewMockUrlRepository(ctrl)
+  zooKeeperMock.EXPECT().SetNewRange().Return(1,5,nil) 
+  service, _ := url.InitUrl(zooKeeperMock, urlRepoMock)
+
+  tests := []struct {
+    Name     string
+    Input    string
+    RunMock  func()
+    Expected *Expected
+  }{
+    {
+      "when success",
+      "B",
+      func() {
+        urlRepoMock.EXPECT().FindBy("B").Return("https://example.com/foobar", nil)
+      },
+      &Expected{
+        Res: "https://example.com/foobar",
+        Err: nil,
+      },
+    },
+  }
+  for _, test := range tests {
+    t.Run(test.Name, func(t *testing.T) {
+      test.RunMock()
+
+      res, err := service.OriginalURL(test.Input)
+      assert.Equal(t, test.Expected.Res, res)
+      assert.Equal(t, test.Expected.Err, err)
     })
   }
 }

@@ -2,6 +2,7 @@ package url
 
 import (
 	"go-url-shortener/internal/adpater/zookeeper"
+	"go-url-shortener/internal/repository/url"
 	"go-url-shortener/internal/service/base62"
 	"sync"
 )
@@ -15,17 +16,19 @@ type UrlService interface {
 
 type Impl struct {
   ZkClient zookeeper.Zookeeper
+  Repo url.UrlRepository
   RangeStart int
   RangeEnd int
 }
 
-func InitUrl(zkClient zookeeper.Zookeeper) (*Impl, error) {
+func InitUrl(zkClient zookeeper.Zookeeper, repo url.UrlRepository) (UrlService, error) {
   start, end, err := zkClient.SetNewRange()
   if err != nil {
     return nil, err
   }
   return &Impl{
     ZkClient: zkClient,
+    Repo: repo,
     RangeStart: start,
     RangeEnd: end,
   }, nil
@@ -37,12 +40,18 @@ func (i *Impl) GenerateShortURL(longURL string) (string, error) {
     return "", err
   }
   shortUrl := base62.Encode(uint64(uniqueId))
-  // TODO: store it into the database
+	if err := i.Repo.Create(longURL, shortUrl); err != nil {
+		return "", err
+	}
   return shortUrl, nil
 }
 
 func (i *Impl) OriginalURL(shortURL string) (string, error)  {
-  return "https://example.com/foobar", nil
+  longURL, err := i.Repo.FindBy(shortURL)
+  if ; err != nil {
+		return "", err
+	}
+  return longURL, nil
 }
 
 func (i *Impl) GetUniqeId() (int, error) {
