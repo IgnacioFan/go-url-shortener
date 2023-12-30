@@ -24,6 +24,10 @@ type Expected struct {
 func TestCreateURL(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	urlServiceMock := mocks.NewMockUrlService(ctrl)
+	restAPI := rest.Impl{
+    Engine: gin.Default(),
+    Url: urlServiceMock, 
+  }
 
 	tests := []struct {
 		Name     string
@@ -63,7 +67,7 @@ func TestCreateURL(t *testing.T) {
 
 			ctx := CreateGinContext("POST", "/v1/urls", reqBody, w)
 			test.RunMock()
-			rest.InitShortUrl(urlServiceMock).CreateURL(ctx)
+			restAPI.CreateURL(ctx)
 			
 			assert.Equal(t, test.Expected.Status, w.Code)
 			assert.Equal(t, test.Expected.Body, w.Body.String())
@@ -74,6 +78,10 @@ func TestCreateURL(t *testing.T) {
 func TestRedirectURL(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	urlServiceMock := mocks.NewMockUrlService(ctrl)
+	restAPI := rest.Impl{
+    Engine: gin.Default(),
+    Url: urlServiceMock, 
+  }
 
 	tests := []struct {
 		Name     string
@@ -129,7 +137,7 @@ func TestRedirectURL(t *testing.T) {
 			ctx := CreateGinContext("GET", "/v1/urls", nil, w)
 			ctx.Params = append(ctx.Params, gin.Param{Key: "name", Value: test.Input})
 			test.RunMock()
-			rest.InitShortUrl(urlServiceMock).RedirectURL(ctx)
+			restAPI.RedirectURL(ctx)
 			
 			assert.Equal(t, test.Expected.Status, w.Code)
 			if test.Expected.Status == http.StatusFound {

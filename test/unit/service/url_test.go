@@ -1,7 +1,7 @@
 package service_test
 
 import (
-	"go-url-shortener/internal/service/url"
+	"go-url-shortener/internal/service/url_service"
 	"go-url-shortener/test/mocks"
 	"testing"
 
@@ -18,8 +18,12 @@ func TestGenerateShortURL(t *testing.T) {
   ctrl := gomock.NewController(t)
   zooKeeperMock := mocks.NewMockZookeeper(ctrl)
   urlRepoMock := mocks.NewMockUrlRepository(ctrl)
-  zooKeeperMock.EXPECT().SetNewRange().Return(1,5,nil) 
-  service, _ := url.InitUrl(zooKeeperMock, urlRepoMock)
+  service := url_service.Impl{
+    ZkClient: zooKeeperMock,
+    Repo: urlRepoMock,
+    RangeStart: 1,
+    RangeEnd: 5,
+  }
 
   tests := []struct {
     Name     string
@@ -59,8 +63,12 @@ func TestShortUrlRedirect(t *testing.T) {
   ctrl := gomock.NewController(t)
   zooKeeperMock := mocks.NewMockZookeeper(ctrl)
   urlRepoMock := mocks.NewMockUrlRepository(ctrl)
-  zooKeeperMock.EXPECT().SetNewRange().Return(1,5,nil) 
-  service, _ := url.InitUrl(zooKeeperMock, urlRepoMock)
+  service := url_service.Impl{
+    ZkClient: zooKeeperMock,
+    Repo: urlRepoMock,
+    RangeStart: 1,
+    RangeEnd: 5,
+  }
 
   tests := []struct {
     Name     string
