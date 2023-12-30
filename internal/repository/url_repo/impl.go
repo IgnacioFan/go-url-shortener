@@ -1,4 +1,4 @@
-package url
+package url_repo
 
 import (
 	"go-url-shortener/internal/entity"

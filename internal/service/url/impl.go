@@ -2,7 +2,7 @@ package url
 
 import (
 	"go-url-shortener/internal/adpater/zookeeper"
-	"go-url-shortener/internal/repository/url"
+	"go-url-shortener/internal/repository/url_repo"
 	"go-url-shortener/internal/service/base62"
 	"sync"
 )
@@ -16,12 +16,12 @@ type UrlService interface {
 
 type Impl struct {
   ZkClient zookeeper.Zookeeper
-  Repo url.UrlRepository
+  Repo url_repo.UrlRepository
   RangeStart int
   RangeEnd int
 }
 
-func InitUrl(zkClient zookeeper.Zookeeper, repo url.UrlRepository) (UrlService, error) {
+func InitUrl(zkClient zookeeper.Zookeeper, repo url_repo.UrlRepository) (UrlService, error) {
   start, end, err := zkClient.SetNewRange()
   if err != nil {
     return nil, err

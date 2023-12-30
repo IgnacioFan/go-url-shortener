@@ -2,6 +2,7 @@ package zookeeper
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 
@@ -10,8 +11,11 @@ import (
 
 const (
   ROOT_PATH = "/url"
-  ZK_DOMAIN = "localhost" // os.Getenv("ZOOKER_URL")
 	TOKEN_RANGE = 100
+)
+
+var (
+	zkDomain = os.Getenv("ZOOKEEPER_HOST")
 )
 
 type Zookeeper interface {
@@ -23,7 +27,7 @@ type Impl struct {
 }
 
 func InitZooKeeper() (*Impl, error) {
-	conn, _, err := zk.Connect([]string{ZK_DOMAIN}, time.Second)
+	conn, _, err := zk.Connect([]string{zkDomain}, time.Second)
 	if err != nil {
 		return nil, err
 	}
