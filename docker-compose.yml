@@ -40,17 +40,17 @@ services:
       replicas: 2
     command: "./app server"
 
-  # redis:
-  #   build:
-  #     context: .
-  #     dockerfile: dockerconfig/redis/Dockerfile
-  #   container_name: ${REDIS_HOST}
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - ${REDIS_PORT}:6379
-  #   networks:
-  #     - go-url-shortener.network
+  redis:
+    build:
+      context: .
+      dockerfile: dockerconfig/redis/Dockerfile
+    container_name: ${REDIS_HOST}
+    env_file:
+      - .env
+    ports:
+      - ${REDIS_PORT}:6379
+    networks:
+      - go-url-shortener.network
   
   zookeeper:
     build:

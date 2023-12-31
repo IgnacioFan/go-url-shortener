@@ -1,6 +1,7 @@
 package url_service
 
 import (
+	"go-url-shortener/internal/adpater/redis"
 	"go-url-shortener/internal/adpater/zookeeper"
 	"go-url-shortener/internal/repository/url_repo"
 	"go-url-shortener/internal/service/base62"
@@ -18,6 +19,7 @@ type UrlService interface {
 type Impl struct {
   ZkClient zookeeper.Zookeeper
   Repo url_repo.UrlRepository
+  Cache redis.Cache
   RangeStart int
   RangeEnd int
 }
@@ -37,9 +39,15 @@ func NewUrlService() (UrlService, error) {
   if err != nil {
     return nil, err
   }
+  cache, err := redis.InitCache()
+  if err != nil {
+    return nil, err
+  }
+
   return &Impl{
     ZkClient: zkClient,
     Repo: repo,
+    Cache: cache,
     RangeStart: start,
     RangeEnd: end,
   }, nil
@@ -57,11 +65,18 @@ func (i *Impl) GenerateShortURL(longURL string) (string, error) {
   return shortUrl, nil
 }
 
-func (i *Impl) OriginalURL(shortURL string) (string, error)  {
-  longURL, err := i.Repo.FindBy(shortURL)
-  if ; err != nil {
-		return "", err
-	}
+func (i *Impl) OriginalURL(shortURL string) (longURL string, err error)  {
+  longURL, err = i.Cache.Get(shortURL)
+
+  if len(longURL) == 0 && err.Error() == "No entry" {
+    longURL, err = i.Repo.FindBy(shortURL)
+    if err != nil {
+      return "", err
+    }
+    i.Cache.Set(shortURL, longURL)
+  } else if len(longURL) == 0 && err != nil {
+    return "", err
+  }
   return longURL, nil
 }
 
