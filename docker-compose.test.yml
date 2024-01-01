@@ -4,12 +4,21 @@ services:
   db:
     image: postgres:15.3-alpine
     env_file:
-      - /test/integration/.env
+      - test/integration/.env
     ports:
       - ${POSTGRES_PORT}:5432
   redis:
     image: redis:7.0.11-alpine
     env_file:
-      - /test/integration/.env
+      - test/integration/.env
     ports:
       - ${REDIS_PORT}:6379
+  zookeeper:
+    build:
+      context: .
+      dockerfile: dockerconfig/zookeeper/Dockerfile
+    container_name: ${ZOOKEEPER_HOST}
+    env_file:
+      - test/integration/.env
+    ports:
+      - "2181:2181"

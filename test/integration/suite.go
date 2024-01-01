@@ -1,9 +1,9 @@
 package integration
 
 import (
-	"go-url-shortener/internal/wire_inject/app"
+	"go-url-shortener/internal/app/rest"
+	"go-url-shortener/internal/service/url_service"
 	"go-url-shortener/pkg/postgres"
-	"net/http/httptest"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -17,21 +17,25 @@ func init() {
 
 type TestSuite struct {
 	suite.Suite
-	TestServer *httptest.Server
+	TestServer *rest.Impl
 	TestDB     *postgres.Postgres
 }
 
 func (t *TestSuite) SetupSuite() {
 	db, err := postgres.NewPostgres()
 	t.Require().NoError(err)
+	t.TestDB = db
 
 	if err = db.NewMigrate(); err != nil {
 		t.Require().NoError(err)
 	}
 
-	app, err := app.Initialize()
+	service, err := url_service.NewUrlService()   
 	t.Require().NoError(err)
 
-	t.TestDB = db
-	t.TestServer = httptest.NewServer(app.HttpServer.Engine)
+	t.TestServer = &rest.Impl{
+		Engine: gin.Default(),
+		Url: service,
+	}
+	t.TestServer.SetRouter()
 }

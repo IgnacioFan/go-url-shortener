@@ -14,10 +14,6 @@ const (
 	TOKEN_RANGE = 100
 )
 
-var (
-	zkDomain = os.Getenv("ZOOKEEPER_HOST")
-)
-
 type Zookeeper interface {
 	SetNewRange() (int, int, error)
 }
@@ -27,6 +23,7 @@ type Impl struct {
 }
 
 func InitZooKeeper() (*Impl, error) {
+	zkDomain := os.Getenv("ZOOKEEPER_HOST")
 	conn, _, err := zk.Connect([]string{zkDomain}, time.Second)
 	if err != nil {
 		return nil, err
