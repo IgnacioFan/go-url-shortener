@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"go-url-shortener/deployment/migration"
+	"go-url-shortener/internal/migration"
 
 	"github.com/go-gormigrate/gormigrate/v2"
 )

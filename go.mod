@@ -6,10 +6,11 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-gormigrate/gormigrate/v2 v2.0.2
-	github.com/go-playground/assert/v2 v2.2.0
 	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/golang/mock v1.6.0
 	github.com/google/wire v0.5.0
 	github.com/joho/godotenv v1.4.0
+	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.1
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
@@ -49,10 +50,10 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.9 // indirect
 	golang.org/x/arch v0.0.0-20210923205945-b76863e36670 // indirect
-	golang.org/x/crypto v0.6.0 // indirect
-	golang.org/x/net v0.7.0 // indirect
-	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/text v0.7.0 // indirect
-	google.golang.org/protobuf v1.28.1 // indirect
+	golang.org/x/crypto v0.12.0 // indirect
+	golang.org/x/net v0.14.0 // indirect
+	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/text v0.12.0 // indirect
+	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
