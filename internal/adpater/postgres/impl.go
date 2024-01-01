@@ -1,8 +1,8 @@
 package postgres
 
 import (
-	"go-url-shortener/deployment/env"
 	"go-url-shortener/internal/migration"
+	"go-url-shortener/internal/util"
 
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/driver/postgres"
@@ -14,7 +14,7 @@ type Postgres struct {
 }
 
 func NewPostgres() (*Postgres, error) {
-	db, err := gorm.Open(postgres.Open(env.DSN()), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(util.DSN()), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}

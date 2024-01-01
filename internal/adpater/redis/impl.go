@@ -3,7 +3,7 @@ package redis
 import (
 	"errors"
 	"fmt"
-	"go-url-shortener/deployment/env"
+	"go-url-shortener/internal/util"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -19,7 +19,7 @@ type Impl struct {
 }
 
 func InitCache() (Cache, error) {
-	redis := redis.NewClient(&redis.Options{Addr: env.RedisAddr()})
+	redis := redis.NewClient(&redis.Options{Addr: util.RedisAddr()})
 	pong, err := redis.Ping().Result()
 	if err != nil {
 		return nil, err
