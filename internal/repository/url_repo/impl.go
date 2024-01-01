@@ -1,8 +1,8 @@
 package url_repo
 
 import (
+	"go-url-shortener/internal/adpater/postgres"
 	"go-url-shortener/internal/entity"
-	"go-url-shortener/pkg/postgres"
 )
 
 type UrlRepository interface {

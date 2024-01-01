@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"go-url-shortener/internal/adpater/postgres"
 	"go-url-shortener/internal/app/rest"
 	"go-url-shortener/internal/service/url_service"
-	"go-url-shortener/pkg/postgres"
 	"log"
 	"os"
 

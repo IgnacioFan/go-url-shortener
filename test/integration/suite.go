@@ -1,9 +1,9 @@
 package integration
 
 import (
+	"go-url-shortener/internal/adpater/postgres"
 	"go-url-shortener/internal/app/rest"
 	"go-url-shortener/internal/service/url_service"
-	"go-url-shortener/pkg/postgres"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"

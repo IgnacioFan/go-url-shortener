@@ -1,11 +1,11 @@
 package url_service
 
 import (
+	"go-url-shortener/internal/adpater/postgres"
 	"go-url-shortener/internal/adpater/redis"
 	"go-url-shortener/internal/adpater/zookeeper"
 	"go-url-shortener/internal/repository/url_repo"
 	"go-url-shortener/internal/service/base62"
-	"go-url-shortener/pkg/postgres"
 	"sync"
 )
 
