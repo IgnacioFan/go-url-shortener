@@ -1,6 +1,6 @@
 # Go URL Shortener
 
-Welcome to visit my project! This repo showcases a robust and scalable system design around the popular topic of designing a URL Shortener (or TinyURL). The implementation delves into functional and non-functional aspects of system architecture.
+Welcome to visit my project! This repo showcases the design of a URL Shortener (or TinyURL). The implementation delves into functional and non-functional aspects of system architecture.
 
 Functional Requirements
 1. URL Shortening: efficiently shorten URLs.
