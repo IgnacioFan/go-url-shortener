@@ -1,26 +1,14 @@
-import { useState } from "react";
+import { Url } from '../interfaces/url';
 
-interface Url {
-  longUrl: string;
-  shortUrl: string;
+interface Props {
+  urls: Url[]
 }
 
-const List: React.FC = () => {
-  const [urlList, setUrlList] = useState<Url[]>([
-    {
-      longUrl: "https://www.udemy.com/",
-      shortUrl: "abc",
-    },
-    {
-      longUrl: "https://www.kkday.com/zh-tw",
-      shortUrl: "edc",
-    }
-  ]);
-
+const List: React.FC<Props> = ({ urls }) => {
   return (
     <div className="container">
       <div className="list">
-        {urlList.map((item, idx) => (
+        {urls.map((item, idx) => (
           <div className="item" key={idx}>
               <a onClick={() => window.open(item.longUrl)} className="long-url">
                 {item.longUrl}
@@ -28,7 +16,7 @@ const List: React.FC = () => {
               <div className="short-url-container">
                 <div className="tooltip">
                   <span>{item.shortUrl}</span>
-                  <button className="copy" onClick={() => console.log("copied short url " + item.shortUrl)}>Copy</button>
+                  <button className="copy" onClick={() => navigator.clipboard.writeText(item.shortUrl)}>Copy</button>
                 </div>
               </div>
           </div>
