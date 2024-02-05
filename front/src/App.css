@@ -50,7 +50,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 5em;
+  margin-bottom: 1em;
   padding: 1em;
 }
 
@@ -59,29 +59,31 @@
   width: 100%;
   align-items: center;
   justify-content: center;
+  margin-bottom: 1em;
 
   .form {
-    display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
 
-    .input-label {
+    .form-container {
       display: flex;
       align-items: center;
-      width: 75%;
+      margin-top: 5px;
+      margin-bottom: 5px;
     }
 
-    h3 {
-      width: 6em;
-      margin-right: 0.6em;
+    .input-label {
+      display: flex;
+      width: 8%;
     }
 
     .input-field {
       border-radius: 2px;
       border: 0;
-      width: 90%;
+      width: 82%;
       height: 2em;
+      margin-left: 0.6em;
       margin-right: 0.6em;
       padding-inline-start: 0.5em;
       padding-inline-end: 0.5em;
@@ -118,8 +120,13 @@
       opacity: 0.9;
       cursor: pointer;
       color: gray !important;
-      text-decoration: none !important;
+      text-align: left;
       opacity: 0.8;
+      /* avoid text overflow */
+      overflow: hidden;
+      white-space: nowrap;
+      text-decoration: none !important;
+      width: 85%;
     }
 
     .long-url:hover {
@@ -129,24 +136,36 @@
 
     .short-url-container {
       display: flex;
-      flex-direction: row;
       align-items: center;
-      justify-content: space-between;
-
-      .tooltip {
-        position: relative;
-        display: inline-block;
-      }
-
-      .copy {
-        margin: auto 1em;
-        background-color: #646cff;
-        border-radius: 4px;
-        padding: 0 .8em;
-        height: 2em;
-        border: 0;
-      }
+      justify-content: right;
+      margin-left: 1em;
+      width: 15%;
     }
+  }
+}
+
+.tooltip-container {
+  position: relative;
+
+  .tooltip {
+    position: absolute;
+    top: -40px;
+    left: 78%;
+    background-color: #3c3c3c;
+    color: #fff;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 0.8em;
+    transform: translateX(-50%);
+  } 
+
+  .tooltip-button {
+    cursor: pointer;
+    margin-left: 1em;
+    background-color: #646cff;
+    border-radius: 4px;
+    height: 2em;
+    border: 10px;
   }
 }
 
