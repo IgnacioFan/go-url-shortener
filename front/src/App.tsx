@@ -8,7 +8,10 @@ import { createShortUrl } from "./apis/shortUrl";
 import { Url } from "./interfaces/url";
 import { formData } from "./interfaces/form";
 
-const urlRegex = /^(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/i;
+const urlRegex = /^(https|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+([^\s]*)$/i;
+// avoid recursively redirections
+const specificDomainRegex = /^(https:\/\/)?(localhost|google\.com)\b/i;
+
 
 function App() {
   const [form, setForm] = useState<formData>({
@@ -17,18 +20,7 @@ function App() {
 
   const [showWarning, setShowWarning] = useState<string>("");
 
-  const [urls, setUrls] = useState<Url[]>(
-    [
-      {
-        longUrl: "https://www.udemy.com/",
-        shortUrl: "abc",
-      },
-      {
-        longUrl: "https://www.kkday.com/zh-tw",
-        shortUrl: "edc",
-      }
-    ]
-  )
+  const [urls, setUrls] = useState<Url[]>([])
 
   const urlInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -62,7 +54,7 @@ function App() {
   }
 
   const validateUrl = (url: string) => {
-    return urlRegex.test(url);
+    return urlRegex.test(url) && !specificDomainRegex.test(url);
   }
 
   return (
