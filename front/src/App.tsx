@@ -4,6 +4,7 @@ import Header from "./components/header";
 import Form from "./components/form";
 import Footer from "./components/footer";
 import List from "./components/list";
+import { createShortUrl } from "./apis/shortUrl";
 import { Url } from "./interfaces/url";
 import { formData } from "./interfaces/form";
 
@@ -45,14 +46,19 @@ function App() {
       setShowWarning("The given URL already exists!")
       return
     }
-    // try making a request and catch exception
-    let pair: Url = {
-      longUrl: form.longUrl,
-      shortUrl: "abcdef"
-    } 
-    console.log(pair)
-    setUrls([pair, ...urls]);
-    setForm({ ...form, longUrl: "" })
+    createShortUrl(form.longUrl).then((responseData) => {
+      let pair: Url = {
+        longUrl: form.longUrl,
+        shortUrl: responseData.data
+      } 
+      console.log(pair)
+      setUrls([pair, ...urls]);
+      setForm({ ...form, longUrl: "" })
+      setShowWarning("")
+    }).catch((err) => {
+      // track the error's details
+      setShowWarning("Unexpected error:" + err.message)
+    })
   }
 
   const validateUrl = (url: string) => {
