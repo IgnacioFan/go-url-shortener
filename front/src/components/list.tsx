@@ -6,6 +6,10 @@ interface Props {
 }
 
 const List: React.FC<Props> = ({ urls }) => {
+  const originalUrl = function (shortUrl: string): string {
+    return "http://localhost/v1/urls/" + shortUrl
+  };
+
   return (
     <div className="container">
       <div className="list">
@@ -17,7 +21,7 @@ const List: React.FC<Props> = ({ urls }) => {
               <div className="short-url-container">
                 <div className="tooltip-container" >
                   <span>{item.shortUrl}</span>
-                  <ToolTip copyValue={item.shortUrl}/>
+                  <ToolTip copyValue={originalUrl(item.shortUrl)}/>
                 </div>
               </div>
           </div>
