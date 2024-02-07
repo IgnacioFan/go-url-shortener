@@ -12,6 +12,10 @@ POSTGRES_PORT=5432
 REDIS_HOST=go-url-shortener-redis
 REDIS_PORT=6379
 
+# Zookeeper
+ZOOKEEPER_HOST=go-url-shortener-zookeeper
+ZOOKEEPER_PORT=2181
+
 EOF
 )
 echo "$ENV_CONTENT" > .env
