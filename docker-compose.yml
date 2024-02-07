@@ -22,15 +22,12 @@ services:
     networks:
       - go-url-shortener.network
 
-  app:
+  api:
     build:
       context: .
       dockerfile: dockerconfig/app/Dockerfile
-    restart: always
     env_file:
       - .env
-    ports:
-      - 3000
     depends_on:
       db:
         condition: service_healthy
@@ -38,7 +35,18 @@ services:
       - go-url-shortener.network
     deploy:
       replicas: 2
-    command: "./app server"
+
+  web:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: web
+    ports:
+      - 80:80
+    depends_on:
+      - api
+    networks:
+      - go-url-shortener.network
 
   redis:
     build:
@@ -64,19 +72,20 @@ services:
     networks:
       - go-url-shortener.network
 
-  nginx:
-    image: nginx:latest
-    volumes:
-      - ./dockerconfig/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    ports:
-      - "80:80"
-    depends_on:
-      - app
-    networks:
-      - go-url-shortener.network
+  # nginx:
+  #   image: nginx:latest
+  #   volumes:
+  #     - ./dockerconfig/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #   ports:
+  #     - "80:80"
+  #   depends_on:
+  #     - app
+  #   networks:
+  #     - go-url-shortener.network
 
 volumes:
   go-url-shortener-db:
 
 networks:
   go-url-shortener.network:
+    driver: bridge

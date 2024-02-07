@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -44,7 +45,7 @@ func NewRestAPI(port int, service url_service.UrlService) error {
     Engine: gin.Default(),
     Url: service, 
   }
-
+  restAPI.Engine.Use(cors.Default())
   restAPI.SetRouter()
 
   if err := restAPI.Run(fmt.Sprintf(":%d", port)); err != nil {
