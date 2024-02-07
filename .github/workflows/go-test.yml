@@ -44,7 +44,10 @@ jobs:
         POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         POSTGRES_PORT: 5432
+        REDIS_HOST: localhost
         REDIS_PORT: 6379
+        ZOOKEEPER_HOST: localhost
+        ZOOKEEPER_PORT: 2181
       run: go test -v -coverprofile=coverage.txt -cover ./test/...
     - name: Upload Coverage Artifact
       uses: actions/upload-artifact@v2
