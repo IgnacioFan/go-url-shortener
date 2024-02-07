@@ -1,40 +1,42 @@
 version: "3.8"
 
 services:
-  db:
+  postgres:
     image: postgres:15.3-alpine
-    container_name: ${POSTGRES_HOST}
-    env_file:
-      - test/integration/.env
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=go-url-shortener-test
     ports:
-      - ${POSTGRES_PORT}:5432
+      - 5432:5432
+    volumes:
+      - go-url-shortener-db-test:/var/lib/postgresql/data
     networks:
       - go-url-shortener-test
     
   redis:
     build:
       context: .
-      dockerfile: dockerconfig/redis/Dockerfile
-    container_name: ${REDIS_HOST}
+      dockerfile: ../dockerconfig/redis/Dockerfile
     env_file:
       - test/integration/.env
     ports:
-      - ${REDIS_PORT}:6379
+      - 6379:6379
     networks:
       - go-url-shortener-test
     
   zookeeper:
     build:
       context: .
-      dockerfile: dockerconfig/zookeeper/Dockerfile
-    container_name: ${ZOOKEEPER_HOST}
-    env_file:
-      - test/integration/.env
+      dockerfile: ../dockerconfig/zookeeper/Dockerfile
     ports:
-      - "2181:2181"
+      - 2181:2181
     networks:
       - go-url-shortener-test
 
 networks:
   go-url-shortener-test:
     driver: bridge
+
+volumes:
+  go-url-shortener-db-test:
