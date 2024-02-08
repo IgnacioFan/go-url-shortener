@@ -11,10 +11,12 @@ Non-functional Requirements:
 2. **Low Latency**: The system should perform at low latency to provide a smooth user experience.
    
 ## 🎉 Demonstration
-All services are managed on Docker using Docker-compose. The services include 1 web server, 2 API servers, 1 Zookeeper, 1 Redis, and 1 PostgreSQL. For more details, refer to [How to Run](#🚀-how-to-run).
+All services are managed on Docker using Docker-compose. The services include 1 web server, 2 API servers, 1 Zookeeper, 1 Redis, and 1 PostgreSQL.
+
+For more details, refer to [How to Run](#🚀-how-to-run).
 
 <p align="center">
-<img src="./doc/demo.png" width="90%"/>
+<img src="./doc/demo.png" width="100%"/>
 </p>
 
 ## 📁 Project Structure
@@ -28,13 +30,13 @@ All services are managed on Docker using Docker-compose. The services include 1 
 ## 🛠️ System Architecture 🚧
 
 <p align="center">
-<img src="./doc/architecture.png" width="90%"/>
+<img src="./doc/architecture.png" width="100%"/>
 </p>
 
 The system comprises different components: 
 
 - A web server is a `React` application with `Nginx`.
-- API server replicas that handle `HTTP/RPC` requests/responses, a unique ID generator, and `Base62`. 
+- API server replicas that handle `REST/RPC` requests/responses, a unique ID generator, and `Base62`. 
 - A `Zookeeper` provides distributed synchronization and supports the unique ID generation by maintaining sequence range for each API server replica. 
 - A database stores the mapping of long and short URLs. `PostgreSQL` was chosen to focus on the performance of the application layer, with storage performance considered a future enhancement. 
 - Furthermore, frequent read requests are cached by `Redis` to reduce latency and boost response times.
